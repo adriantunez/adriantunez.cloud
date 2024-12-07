@@ -1,0 +1,72 @@
+
+############################# Main Menu ########################
+[[main]]
+name = "Home"
+url = "/"
+weight = 1
+
+#### BLOG BLOCK START
+[[main]]
+weight = 2
+url = "blog/"
+name = "Blog"
+hasChildren = true
+
+[[main]]
+parent = "Blog"
+name = "Categories"
+url = "categories/"
+weight = 1
+
+[[main]]
+parent = "Blog"
+name = "Tags"
+url = "tags/"
+weight = 2
+#### PAGES BLOCK END
+
+[[main]]
+name = "Lightning pills"
+url = "categories/lightning-pills"
+weight = 3
+
+[[main]]
+name = "About"
+url = "authors/adri-antunez"
+weight = 4
+
+[[main]]
+name = "Contact"
+url = "contact/"
+weight = 5
+
+############################# Footer Menu ########################
+[[footer]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[footer]]
+name = "Blog"
+url = "blog/"
+weight = 2
+
+[[footer]]
+name = "Lightning pills"
+url = "categories/lightning-pills"
+weight = 3
+
+[[footer]]
+name = "Authors"
+url = "authors/"
+weight = 4
+
+[[footer]]
+name = "About"
+url = "authors/adri-antunez"
+weight = 5
+
+[[footer]]
+name = "Contact"
+url = "contact/"
+weight = 6

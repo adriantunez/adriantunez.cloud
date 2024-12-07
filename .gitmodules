@@ -1,0 +1,3 @@
+[submodule "adriantunez.web/themes/bookworm-light-hugo"]
+	path = adriantunez.web/themes/bookworm-light-hugo
+	url = git@github.com:adriantunez/bookworm-light-hugo.git
