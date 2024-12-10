@@ -27,7 +27,7 @@ image_gallery = true
 
 # copyright
 theme_copyright = true
-copyright = "Copyright Adriantunez.cloud"
+copyright = "The opinions presented here are the author's own and do not necessarily represent those of the employer.<br/>Copyright by Adriantunez.cloud."
 
 # google tag manager, see https://developers.google.com/tag-manager/
 google_tag_manager = "" # example: G-XXXXXXXXXX
@@ -99,10 +99,6 @@ domain = "" # yourdomain.com
 enable = false
 username = "" # your username
 
-# cloudflare web analytics
-[cloudflare_analytics]
-enable = true
-
 # site verifications
 [site_verification]
 google = "" # Your verification code
@@ -135,7 +131,25 @@ url = "/index.xml"
 icon = "las la-envelope"
 url = "/contact"
 
+######################## custom #########################
+# cloudflare web analytics
+[cloudflare_analytics]
+enable = true
+src = "https://static.cloudflareinsights.com/beacon.min.js"
+token = "719df5375d68451f87ac7a5904790470"
+
+# lightning pills notice
 [lightning_pills]
 enable = true
 name= "Lightning Pills"
 text = "Concise posts designed to easily share insights and experiences across a diverse range of topics inspired by daily work."
+
+# giscuss script
+[giscuss]
+enable = true
+
+# about author info in main
+[author_in_main]
+enable = true
+author = "authors/adri-antunez"
+show_name = true

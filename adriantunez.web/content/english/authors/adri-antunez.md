@@ -7,7 +7,7 @@ draft: false
 # caption
 caption:
   enable: true
-  title: "Cloud Architect · DevSecOps · Casual Speaker"
+  title: "Cloud Architect · DevSecOps · Casual Speaker<br/>Based in Barcelona, Spain"
 
 # social
 social:
@@ -29,7 +29,6 @@ social:
 what_i_do:
   title: "Main skills"
   enable: true
-  # TODO: FIll me but include security, aws, certifications and soft skills
   item:
   - title: "Technical Skills"
     icon: "las la-cog"
