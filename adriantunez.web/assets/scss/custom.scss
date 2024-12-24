@@ -1,0 +1,127 @@
+// Text colors
+// ====================================
+.text-primary {
+  color: $color_primary;
+}
+
+// Images
+// ====================================
+.image-container {
+  position: relative;
+}
+.overlay-text {
+  position: absolute;
+  top: 25px;
+  left: 0px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  border-radius: 0 5px 5px 0;
+  // font-size: 16px;
+  font-weight: bold;
+  color: $color_primary;
+}
+
+// Timeline
+// =============================
+.timeline-page:after {
+  position: absolute;
+  content: "";
+  left: 0;
+  right: -1px;
+  top: 0px;
+  width: 1px;
+  height: 100%;
+  margin: auto;
+  border-right: 2px dashed #dee2e6 !important;
+}
+.timeline-page .timeline-item .date-label-left:after,
+.timeline-page .timeline-item .date-label-left:before,
+.timeline-page .timeline-item .duration-right:after,
+.timeline-page .timeline-item .duration-right:before {
+  position: absolute;
+  content: "";
+  border-radius: 50%;
+  z-index: 1;
+}
+.timeline-page .timeline-item .date-label-left:before,
+.timeline-page .timeline-item .duration-right:before {
+  border: 2px dashed #dee2e6;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  background-color: #fff;
+}
+.timeline-page .timeline-item .date-label-left {
+  float: right;
+  margin-right: 24px;
+}
+.timeline-page .timeline-item .date-label-left:after {
+  right: -41px;
+}
+.timeline-page .timeline-item .date-label-left:before {
+  right: -50px;
+}
+.timeline-page .timeline-item .duration-right {
+  float: left;
+  margin-left: 24px;
+}
+.timeline-page .timeline-item .duration-right:after {
+  left: -41px;
+}
+.timeline-page .timeline-item .duration-right:before {
+  left: -50px;
+}
+.timeline-page .timeline-item .event {
+  transition: all 0.2s ease;
+}
+.timeline-page .timeline-item .event .title {
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.timeline-page .timeline-item .event.event-description-right {
+  text-align: left;
+  margin-left: 24px;
+}
+.timeline-page .timeline-item .event.event-description-left {
+  text-align: right;
+  margin-right: 24px;
+}
+@media (max-width: 575px) {
+  .timeline-page {
+      margin-left: 18px;
+  }
+  .timeline-page:after {
+      margin: 0;
+  }
+  .timeline-page .timeline-item .duration {
+      float: left !important;
+      margin-left: 30px !important;
+      margin-right: auto !important;
+      text-align: left !important;
+  }
+  .timeline-page .timeline-item .duration:after {
+      left: -34px !important;
+  }
+  .timeline-page .timeline-item .duration:before {
+      left: -42px !important;
+  }
+  .timeline-page .timeline-item .duration .event {
+      text-align: left !important;
+      margin-left: 15px;
+  }
+  .timeline-page .timeline-item .event.event-description-left,
+  .timeline-page .timeline-item .event.event-description-right {
+      text-align: left !important;
+      margin: 0 0 0 30px !important;
+  }
+}
+.avatar.avatar-ex-small {
+  height: 36px;
+  width: 36px;
+}
+
+// Newsletter
+// =============================
+.mastfoot .inner {
+  display: none;
+}

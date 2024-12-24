@@ -27,7 +27,7 @@ image_gallery = true
 
 # copyright
 theme_copyright = true
-copyright = "The opinions presented here are the author's own and do not necessarily represent those of the employer.<br/>Copyright by Adriantunez.cloud."
+copyright = "The opinions presented here are the author's own and do not necessarily represent those of the employer.<br>Copyright by Adriantunez.cloud."
 
 # google tag manager, see https://developers.google.com/tag-manager/
 google_tag_manager = "" # example: G-XXXXXXXXXX
@@ -61,14 +61,13 @@ enable = false
 instagram_user = "bookworm"
 access_token = "IGQVJYeUk4YWNIY1h4OWZANeS1wRHZARdjJ5QmdueXN2RFR6NF9iYUtfcGp1NmpxZA3RTbnU1MXpDNVBHTzZAMOFlxcGlkVHBKdjhqSnUybERhNWdQSE5hVmtXT013MEhOQVJJRGJBRURn"
 
-# Subscription
-[subscription]
-enable = false
-# mailchimp subsciption
-mailchimp_form_action = "https://gmail.us4.list-manage.com/subscribe/post?u=463ee871f45d2d93748e77cad&amp;id=a0a2c6d074" # replace this url with yours
-mailchimp_form_name = "b_463ee871f45d2d93748e77cad_a0a2c6d074" # replace this code with yours
-title = "Subscribe for the newsletter!"
-input_placeholder = "Enter your email"
+# Newsletter
+[newsletter]
+enable = true
+remote_src = "https://eocampaign1.com/form/"
+footer_title = "Sign up to the monthly newsletter"
+footer_data_form = "8e694c36-a82d-11ef-bc12-9d5464cdd592"
+single_data_form = "e0f7f1f6-c145-11ef-9f56-f1a20e675a18"
 
 # Crisp Chat
 [crisp_chat]
@@ -133,10 +132,9 @@ url = "/contact"
 
 ######################## custom #########################
 # cloudflare web analytics
-[cloudflare_analytics]
+[analytics]
 enable = true
-src = "https://static.cloudflareinsights.com/beacon.min.js"
-token = "719df5375d68451f87ac7a5904790470"
+src = "https://scripts.simpleanalyticscdn.com/latest.js"
 
 # lightning pills notice
 [lightning_pills]
@@ -152,4 +150,4 @@ enable = true
 [author_in_main]
 enable = true
 author = "authors/adri-antunez"
-show_name = true
+show_name = false

@@ -1,7 +1,7 @@
 ---
 title: 'Importance Transparency Communication'
 url: 'importance-transparency-communication'
-image: "images/post/2-ama-session.png"
+image: "images/post/2-ama-session.jpg"
 date: '2024-12-06T10:09:33+01:00'
 author: "Adri Antunez"
 tags: ["communication", "transparency", "people"]

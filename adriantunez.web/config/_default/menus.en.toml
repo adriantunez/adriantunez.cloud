@@ -47,21 +47,26 @@ url = "/"
 weight = 1
 
 [[footer]]
+name = "Privacy Policy"
+url = "/privacy-policy"
+weight = 2
+
+[[footer]]
 name = "Blog"
 url = "blog/"
-weight = 2
+weight = 3
 
 [[footer]]
 name = "Lightning Pills"
 url = "categories/lightning-pills"
-weight = 3
+weight = 4
 
 [[footer]]
 name = "About"
 url = "authors/adri-antunez"
-weight = 4
+weight = 5
 
 [[footer]]
 name = "Contact"
 url = "contact/"
-weight = 5
+weight = 6
