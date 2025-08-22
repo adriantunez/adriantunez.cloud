@@ -1,0 +1,30 @@
+languageCode = "en"
+languageName = "English"
+weight = 1
+title = "Adriantunez.cloud"
+
+[params]
+  displayName = "English"
+  isoCode = "en"
+  rtl = false
+  dateFormat = "2 January 2006"
+  # logo = "img/logo.png"
+  # secondaryLogo = "img/secondary-logo.png"
+  description = "Adri Antunez personal blog"
+  copyright = "Copyright by adriantunez.cloud"
+
+[params.author]
+  name = "Adri Antunez"
+  # email = "youremail@example.com"
+  image = "img/me.jpeg"
+  imageMain = "img/adri-antunez-main-nb.png"
+  imageQuality = 80
+  headline = "AWS Cloud Architect · Platform Engineer · Site Reliability Engineer · Dad joke maker"
+  bio = "AWS Cloud Architect · Platform Engineer · Site Reliability Engineer · Dad joke maker"
+  links = [
+    { github = "https://github.com/adriantunez" },
+    { linkedin = "https://www.linkedin.com/in/adriantunez" },
+    { rss = "/index.xml" },
+    # { youtube = "https://youtube.com/@adriantunezcloud" },
+    { envelope = "/contact" },
+  ]

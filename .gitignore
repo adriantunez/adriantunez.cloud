@@ -1,0 +1,15 @@
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# TODO: Change this to CI/CD
+# Script files
+develop.sh
+deploy.sh
+
+# Hugo build files
+/web/public/
+/web/resources/
+/web/hugo_stats.json
+/web/.hugo_build.lock
+/output/

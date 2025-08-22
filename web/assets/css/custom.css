@@ -1,0 +1,19 @@
+/* Enforce a marging top (mt-5) on every h1 */
+h1 {
+  margin-top: calc(var(--spacing) * 5);
+}
+
+/* Enforce full with in articles */
+div.article-content.max-w-prose.mb-20 {
+  max-width: fit-content;
+}
+
+/* Enforce full with in taxonomies description */
+div.min-w-0.min-h-0.max-w-prose {
+  max-width: fit-content;
+}
+
+/* Increase the default font size */
+html {
+  font-size: 13pt;
+}

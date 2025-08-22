@@ -1,0 +1,41 @@
+<div id="giscus-container"></div>
+
+<script>
+  function getCurrentTheme() {
+    return document.documentElement.classList.contains('dark') ? 'transparent_dark' : 'light_tritanopia';
+  }
+
+  function loadGiscus() {
+    const script = document.createElement('script');
+    script.src = "https://giscus.app/client.js";
+    script.setAttribute("data-repo", "{{ .Site.Params.giscus.repo }}");
+    script.setAttribute("data-repo-id", "{{ .Site.Params.giscus.repoId }}");
+    script.setAttribute("data-category", "{{ .Site.Params.giscus.category }}");
+    script.setAttribute("data-category-id", "{{ .Site.Params.giscus.categoryID }}");
+    script.setAttribute("data-mapping", "{{ .Site.Params.giscus.mapping }}");
+    script.setAttribute("data-strict", "0");
+    script.setAttribute("data-reactions-enabled", "1");
+    script.setAttribute("data-emit-metadata", "0");
+    script.setAttribute("data-input-position", "{{ .Site.Params.giscus.inputPosition }}");
+    script.setAttribute("data-theme", getCurrentTheme());
+    script.setAttribute("data-lang", "en");
+    script.setAttribute("data-loading", "lazy");
+    script.setAttribute("crossorigin", "anonymous");
+    script.async = true;
+
+    document.getElementById("giscus-container").appendChild(script);
+  }
+
+  function updateGiscusTheme() {
+    const iframe = document.querySelector('iframe.giscus-frame');
+    if (iframe) {
+      iframe.contentWindow.postMessage({ giscus: { setConfig: { theme: getCurrentTheme() } } }, 'https://giscus.app');
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadGiscus();
+    const observer = new MutationObserver(updateGiscusTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  });
+</script>

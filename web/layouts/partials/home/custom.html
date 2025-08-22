@@ -1,0 +1,39 @@
+{{ $disableImageOptimization := .Site.Params.disableImageOptimization | default false }}
+
+<section class="flex flex-flex items-center justify-center text-center gap-4 mt-10">
+  <div>
+    <!-- Author details -->
+    <h1 class="text-4xl font-extrabold">
+      {{ .Site.Params.Author.name | default .Site.Title }}
+    </h1>
+    
+    <h2 class="text-xl text-neutral-500 dark:text-neutral-400">
+      {{ .Content | markdownify }}
+    </h2>
+    <div class="mt-1 text-2xl flex justify-center items-center">
+      {{ partialCached "author-links.html" . }}
+    </div>
+  </div>
+  <div>
+    <!-- Author main image -->
+    {{ with .Site.Params.Author.imageMain }}
+      {{ $authorImage := "" }}
+      {{ if or (strings.HasPrefix . "http:") (strings.HasPrefix . "https:") }}
+        {{ $authorImage = resources.GetRemote . }}
+      {{ else }}
+        {{ $authorImage = resources.Get . }}
+      {{ end }}
+      {{ if $authorImage }}
+        {{ if not $disableImageOptimization }}
+          {{ $authorImage = $authorImage.Fill (print "344x556 q" ( $.Site.Params.Author.imagequality | default "96" )) }}
+        {{ end }}
+        <img class="mb-2" width="344" height="556" alt="{{ $.Site.Params.Author.name | default " Author" }}"
+          src="{{ $authorImage.RelPermalink }}" />
+      {{ end }}
+    {{ end }}
+  </div>
+</section>
+
+<section>
+  {{ partial "recent-articles/main.html" . }}
+</section>
