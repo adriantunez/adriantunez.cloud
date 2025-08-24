@@ -10,6 +10,7 @@ on:
     types: [created]
 
 env:
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   NODE_PATH: ./infrastructure
 
 # This allows a subsequently queued workflow run to interrupt previous runs
@@ -105,15 +106,15 @@ jobs:
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
-          role-session-name: cdk-${{ matrix.environment }}-diff
-          aws-region: eu-west-1
+          role-session-name: cdk-${{ matrix.environments }}-diff
+          aws-region: eu-central-1
           role-duration-seconds: 7200
 
       - name: Run cdk synth
-        run: npm run cdk:synth:${{ matrix.environment }}
+        run: npm run cdk:synth:${{ matrix.environments }}
 
       - name: Run cdk diff
-        run: npm run cdk:diff:${{ matrix.environment }}
+        run: npm run cdk:diff:${{ matrix.environments }}
 
   deploy:
     name: deploy
