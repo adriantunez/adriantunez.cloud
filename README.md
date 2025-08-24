@@ -3,7 +3,7 @@
 [![Website](https://img.shields.io/badge/Website-adriantunez.cloud-blue?style=flat-square&logo=google-chrome)](https://adriantunez.cloud)
 [![Production](https://img.shields.io/badge/Production-Enabled-brightgreen?style=flat-square)](https://adriantunez.cloud)
 [![Staging](https://img.shields.io/badge/Staging-Disabled-lightgrey?style=flat-square)](#)
-[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Disabled-lightgrey?style=flat-square&logo=githubactions&logoColor=white)](#)
+[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Enabled-brightgreen?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/adriantunez/adriantunez.cloud/actions)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support%20Me-yellow?style=flat-square&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/adriantunez)
 
 This repository hosts the source code for my personal website. A place where I openly share my own learnings as an **AWS Cloud Architect, Platform Engineer, and SRE enthusiast**.
