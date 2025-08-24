@@ -8,15 +8,20 @@ export type GlobalTags = {
   [key: string]: string,
 };
 
-export type OidcSubjectsCdk = {
-  diff: string[];
+export type OidcSubjects = {
+  diff?: string[];
   deploy: string[];
 }
 
 export type EnvironmentConfig = {
   currEnv: Environment;
   awsConfig: ResourceEnvironment;
-  oidcSubjectsCdk: OidcSubjectsCdk;
+  oidcSubjectsCdk: OidcSubjects;
+  oidcSubjectsWeb: OidcSubjects;
+  web: {
+    bucketName: string;
+    distributionId: string;
+  };
 };
 
 export type Config = Record<Environment, EnvironmentConfig>;
@@ -33,7 +38,7 @@ export const envConfig: Config = {
     currEnv: Environment.PROD,
     awsConfig: {
       region: "eu-west-1",
-      account: process.env.AWS_ACCOUNT_ID || '', // If account is not defined, force a failure
+      account: process.env.AWS_ACCOUNT_ID || '', // Fail if not defined in code
     },
     oidcSubjectsCdk: {
       diff: [
@@ -43,5 +48,14 @@ export const envConfig: Config = {
         `repo:${process.env.GITHUB_REPOSITORY}:environment:${Environment.PROD}`,
       ]
     },
+    oidcSubjectsWeb: {
+      deploy: [
+        `repo:${process.env.GITHUB_REPOSITORY}:environment:${Environment.PROD}`,
+      ]
+    },
+    web: {
+      bucketName: process.env.AWS_S3_WEB_BUCKET || '', // Fail if not defined in code
+      distributionId: process.env.WEB_DISTRIBUTION_ID || '', // Fail if not defined in code
+    }
   }
 };

@@ -73,13 +73,13 @@ jobs:
       - name: Configure AWS credentials for deployment
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_CDK_DEPLOY_OIDC_ASSUME_ROLE }} # FIXME: Use lower privilege role
+          role-to-assume: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}
           role-session-name: hugo-deploy
           aws-region: eu-west-1
           role-duration-seconds: 7200
 
       - name: Push to S3
-        run: aws s3 sync ${{ env.HUGO_PATH }}/output/ s3://${{ secrets.AWS_S3_BUCKET }}/cicdtest --delete
+        run: aws s3 sync ${{ env.HUGO_PATH }}/output/ s3://${{ secrets.AWS_S3_WEB_BUCKET }}/cicdtest --delete
 
       - name: Invalidate CloudFront CDN
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

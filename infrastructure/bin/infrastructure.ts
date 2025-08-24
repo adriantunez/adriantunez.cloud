@@ -3,6 +3,7 @@ import { App } from 'aws-cdk-lib';
 import { envConfig, Environment, globalTags } from '../config/environments';
 import { OIDCProviderStack } from '../lib/oidc-provider-stack';
 import { OidcCdkRolesStack } from '../lib/oidc-cdk-roles-stack';
+import { OidcWebRolesStack } from '../lib/oidc-web-roles-stack';
 
 const app = new App();
 const currEnv = app.node.tryGetContext("environment") as Environment || Environment.PROD;
@@ -31,4 +32,15 @@ new OidcCdkRolesStack(app, `OidcCdkRolesStack-${cfg.currEnv}`, {
   globalTags: customTags,
   oidcProviderArn: oidcProviderStack.ghOidcProviderArn,
   oidcSubjects: cfg.oidcSubjectsCdk,
+});
+
+// Create web OIDC Roles (diff and deploy) to be used by any app that relies on web
+new OidcWebRolesStack(app, `OidcWebRolesStack-${cfg.currEnv}`, {
+  env: cfg.awsConfig,
+  currEnv: cfg.currEnv,
+  globalTags: customTags,
+  oidcProviderArn: oidcProviderStack.ghOidcProviderArn,
+  oidcSubjects: cfg.oidcSubjectsWeb,
+  bucketName: cfg.web.bucketName,
+  distributionId: cfg.web.distributionId,
 });
