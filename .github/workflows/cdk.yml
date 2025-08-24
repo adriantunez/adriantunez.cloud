@@ -11,9 +11,6 @@ on:
   #     - main
   release:
     types: [created]
-    paths:
-      - 'infrastructure/**'
-      - '.github/workflows/cdk.yml'
 
 permissions:
   id-token: write
@@ -92,11 +89,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        environments: [prod]
-        # environments: [stag, prod]
+        cdk_environments: [prod]
+        # cdk_environments: [stag, prod]
     env:
-      AWS_S3_WEB_BUCKET: ${{ secrets.AWS_S3_WEB_BUCKET }}
-      AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+      AWS_S3_WEB_BUCKET: ${{ secrets.AWS_S3_WEB_BUCKET }} # FIXME: This is problematic to make it env dependant
+      AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} # FIXME: This is problematic to make it env dependant
     defaults:
       run:
         working-directory: "${{ env.INFRA_PATH }}"
@@ -121,21 +118,26 @@ jobs:
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
-          role-session-name: cdk-${{ matrix.environments }}-diff
+          role-session-name: cdk-${{ matrix.cdk_environments }}-diff
           aws-region: eu-west-1
           role-duration-seconds: 7200
 
       - name: Run cdk synth
-        run: npm run cdk:synth:${{ matrix.environments }}
+        run: npm run cdk:synth:${{ matrix.cdk_environments }}
 
       - name: Run cdk diff
-        run: npm run cdk:diff:${{ matrix.environments }}
+        run: npm run cdk:diff:${{ matrix.cdk_environments }}
 
   deploy:
     name: deploy
     runs-on: ubuntu-latest
     needs: diff
-    environment: prod # FIXME: once we have staging environment
+    strategy:
+      fail-fast: true
+      matrix:
+        cdk_environments: [ prod-infrastructure ]
+        # cdk_environments: [stag, prod]
+    environment: ${{ matrix.cdk_environments }}
     if: github.event_name == 'release'
     defaults:
       run:

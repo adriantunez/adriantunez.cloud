@@ -11,9 +11,6 @@ on:
   #     - main
   release:
     types: [created]
-    paths:
-      - 'web/**'
-      - '.github/workflows/hugo.yml'
 
 permissions:
   id-token: write
@@ -22,6 +19,7 @@ permissions:
 env:
   HUGO_VERSION: 0.148.2
   HUGO_PATH: ./web
+  WEB_BASE_URL: https://adriantunez.cloud
 
 concurrency:
   group: hugo-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -46,7 +44,7 @@ jobs:
           hugo-version: ${{ env.HUGO_VERSION }}
 
       - name: Build Hugo site
-        run: hugo --minify -d output/ --baseURL https://adriantunez.cloud
+        run: hugo --minify -d output/ --baseURL ${{ env.WEB_BASE_URL }}
 
       - name: Upload Hugo artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # was: actions/upload-artifact@v3
@@ -61,7 +59,7 @@ jobs:
     needs: build
     if: github.event_name == 'release'
     environment:
-      name: prod
+      name: prod-web
       url: https://adriantunez.cloud
     steps:
       - name: Download Hugo artifact
@@ -74,7 +72,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}
-          role-session-name: hugo-deploy
+          role-session-name: hugo-${{ environment.name }}-deploy
           aws-region: eu-west-1
           role-duration-seconds: 7200
 
