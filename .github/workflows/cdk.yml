@@ -1,0 +1,149 @@
+name: CDK workflow
+
+on:
+  pull_request:
+  # TODO: Add staging here
+  # push:
+  #   branches:
+  #     - main
+  release:
+    types: [created]
+
+env:
+  NODE_PATH: ./infrastructure
+
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }} # only cancel in-progress runs for PRs
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: "${{ env.NODE_PATH }}"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # was: actions/setup-node@v4
+        with:
+          node-version-file: "${{ env.NODE_PATH }}/.nvmrc"
+          cache: npm
+          cache-dependency-path:  "${{ env.NODE_PATH }}/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+  
+  audit:
+    name: audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "${{ env.NODE_PATH }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # was: actions/setup-node@v4
+        with:
+          node-version-file: "${{ env.NODE_PATH }}/.nvmrc"
+          cache: npm
+          cache-dependency-path:  "${{ env.NODE_PATH }}/package-lock.json"
+
+      - name: Run audit
+        id: audit
+        continue-on-error: true # audit is important but it's not blocking the PR / release process
+        run: npm audit --audit-level ${{ inputs.AUDIT_LEVEL }} > ${{ env.AUDIT_SUMMARY_FILE }}
+
+      - name: Audit results into workflow summary
+        run: cat ${{ env.AUDIT_SUMMARY_FILE }}  > $GITHUB_STEP_SUMMARY
+
+      - name: If audit step was not successful or cancelled, enforce error
+        if: ${{ steps.audit.outcome != 'success' && steps.audit.outcome != 'cancelled' }}
+        run: |
+          echo "npm audit failed"
+          exit 1
+
+  diff:
+    name: diff
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        environments: [prod]
+        # environments: [stag, prod]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # was: actions/setup-node@v4
+        with:
+          node-version-file: "${{ env.NODE_PATH }}/.nvmrc"
+          cache: npm
+          cache-dependency-path:  "${{ env.NODE_PATH }}/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build node
+        run: npm run build
+
+      - name: Short-living AWS credentials from OIDC token and role
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
+          role-session-name: cdk-${{ matrix.environment }}-diff
+          aws-region: eu-west-1
+          role-duration-seconds: 7200
+
+      - name: Run cdk synth
+        run: npm run cdk:synth:${{ matrix.environment }}
+
+      - name: Run cdk diff
+        run: npm run cdk:diff:${{ matrix.environment }}
+
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    needs: diff
+    environment: prod # FIXME: once we have staging environment
+    if: github.event_name == 'release'
+    env:
+      CDK_ENVIRONMENT: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # was: actions/setup-node@v4
+        with:
+          node-version-file: "${{ env.NODE_PATH }}/.nvmrc"
+          cache: npm
+          cache-dependency-path:  "${{ env.NODE_PATH }}/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Short-living AWS credentials from OIDC token and role
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CDK_DEPLOY_OIDC_ASSUME_ROLE }}
+          role-session-name: cdk-${{ env.CDK_ENVIRONMENT }}-deploy
+          aws-region: eu-west-1
+          role-duration-seconds: 7200
+
+      - name: Deploy
+        run: npm run cdk:deploy:${{ env.CDK_ENVIRONMENT }}
