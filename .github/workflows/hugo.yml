@@ -21,6 +21,7 @@ permissions:
 
 env:
   HUGO_VERSION: 0.148.2
+  HUGO_PATH: ./web
 
 concurrency:
   group: hugo-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -32,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./web
+        working-directory: ${{ env.HUGO_PATH }}
     steps:
       - name: Checkout code
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
@@ -52,7 +53,7 @@ jobs:
         if: github.event_name == 'release'
         with:
           name: hugo-site
-          path: output/
+          path: ${{ env.HUGO_PATH }}/output/
 
   deploy:
     name: deploy
