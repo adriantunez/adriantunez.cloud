@@ -9,9 +9,14 @@ on:
   release:
     types: [created]
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   NODE_PATH: ./infrastructure
+  AUDIT_LEVEL: moderate
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -63,7 +68,7 @@ jobs:
       - name: Run audit
         id: audit
         continue-on-error: true # audit is important but it's not blocking the PR / release process
-        run: npm audit --audit-level ${{ inputs.AUDIT_LEVEL }} > ${{ env.AUDIT_SUMMARY_FILE }}
+        run: npm audit --audit-level ${{ env.AUDIT_LEVEL }} > ${{ env.AUDIT_SUMMARY_FILE }}
 
       - name: Audit results into workflow summary
         run: cat ${{ env.AUDIT_SUMMARY_FILE }}  > $GITHUB_STEP_SUMMARY
