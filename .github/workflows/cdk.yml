@@ -83,14 +83,14 @@ jobs:
   diff:
     name: diff
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "${{ env.NODE_PATH }}"
     strategy:
       fail-fast: true
       matrix:
         environments: [prod]
         # environments: [stag, prod]
+    defaults:
+      run:
+        working-directory: "${{ env.NODE_PATH }}"
     steps:
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
@@ -113,7 +113,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
           role-session-name: cdk-${{ matrix.environments }}-diff
-          aws-region: eu-central-1
+          aws-region: eu-west-1
           role-duration-seconds: 7200
 
       - name: Run cdk synth
@@ -128,6 +128,9 @@ jobs:
     needs: diff
     environment: prod # FIXME: once we have staging environment
     if: github.event_name == 'release'
+    defaults:
+      run:
+        working-directory: "${{ env.NODE_PATH }}"
     env:
       CDK_ENVIRONMENT: prod
     steps:
