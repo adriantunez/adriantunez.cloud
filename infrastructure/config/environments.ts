@@ -55,7 +55,7 @@ export const envConfig: Config = {
     },
     web: {
       bucketName: process.env.AWS_S3_WEB_BUCKET || '', // Fail if not defined in code
-      distributionId: process.env.WEB_DISTRIBUTION_ID || '', // Fail if not defined in code
+      distributionId: process.env.AWS_CLOUDFRONT_DISTRIBUTION_ID || '', // Fail if not defined in code
     }
   }
 };
