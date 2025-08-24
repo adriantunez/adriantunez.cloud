@@ -76,6 +76,9 @@ jobs:
   diff:
     name: diff
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "${{ env.NODE_PATH }}"
     strategy:
       fail-fast: true
       matrix:
