@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+        with:
+          submodules: recursive  # get hugo theme submodule
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # was: peaceiris/actions-hugo@v3
@@ -47,6 +49,7 @@ jobs:
 
       - name: Upload Hugo artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # was: actions/upload-artifact@v3
+        if: github.event_name == 'release'
         with:
           name: hugo-site
           path: output/
