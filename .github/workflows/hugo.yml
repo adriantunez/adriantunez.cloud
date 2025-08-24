@@ -68,6 +68,7 @@ jobs:
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # was: actions/download-artifact@v3
         with:
           name: hugo-site
+          path: ${{ env.HUGO_PATH }}/output/
 
       - name: Configure AWS credentials for deployment
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
@@ -78,7 +79,7 @@ jobs:
           role-duration-seconds: 7200
 
       - name: Push to S3
-        run: aws s3 sync output/ s3://$AWS_S3_BUCKET/cicdtest --delete
+        run: aws s3 sync ${{ env.HUGO_PATH }}/output/ s3://$AWS_S3_BUCKET/cicdtest --delete
 
       - name: Invalidate CloudFront CDN
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
