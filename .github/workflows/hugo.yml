@@ -79,7 +79,7 @@ jobs:
           role-duration-seconds: 7200
 
       - name: Push to S3
-        run: aws s3 sync ${{ env.HUGO_PATH }}/output/ s3://$AWS_S3_BUCKET/cicdtest --delete
+        run: aws s3 sync ${{ env.HUGO_PATH }}/output/ s3://${{ secrets.AWS_S3_BUCKET }}/cicdtest --delete
 
       - name: Invalidate CloudFront CDN
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
