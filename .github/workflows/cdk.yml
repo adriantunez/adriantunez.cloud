@@ -2,12 +2,18 @@ name: CDK workflow
 
 on:
   pull_request:
+    paths:
+      - 'infrastructure/**'
+      - '.github/cdk.yml'
   # TODO: Add staging here
   # push:
   #   branches:
   #     - main
   release:
     types: [created]
+    paths:
+      - 'infrastructure/**'
+      - '.github/cdk.yml'
 
 permissions:
   id-token: write
@@ -21,7 +27,7 @@ env:
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: cdk-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }} # only cancel in-progress runs for PRs
 
 jobs:

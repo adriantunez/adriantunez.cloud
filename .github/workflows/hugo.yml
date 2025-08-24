@@ -1,0 +1,80 @@
+name: Hugo workflow
+
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - '.github/hugo.yml'
+  # TODO: Add staging here
+  # push:
+  #   branches:
+  #     - main
+  release:
+    types: [created]
+    paths:
+      - 'web/**'
+      - '.github/hugo.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  HUGO_VERSION: 0.148.2
+
+concurrency:
+  group: hugo-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }} # only cancel in-progress runs for PRs
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # was: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: ${{ env.HUGO_VERSION }}
+
+      - name: Build Hugo site
+        run: hugo --minify -d output/ --baseURL https://adriantunez.cloud
+
+      - name: Upload Hugo artifact
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # was: actions/upload-artifact@v3
+        with:
+          name: hugo-site
+          path: output/
+
+  deploy:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    environment:
+      name: production
+      url: https://adriantunez.cloud
+    steps:
+      - name: Download Hugo artifact
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # was: actions/download-artifact@v3
+        with:
+          name: hugo-site
+          path: output/
+
+      - name: Configure AWS credentials for deployment
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CDK_DEPLOY_OIDC_ASSUME_ROLE }} # FIXME: Use lower privilege role
+          role-session-name: hugo-deploy
+          aws-region: eu-west-1
+          role-duration-seconds: 7200
+
+      - name: Push to S3
+        run: aws s3 sync output/ s3://$AWS_S3_BUCKET/cicdtest --delete
+
+      - name: Invalidate CloudFront CDN
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
