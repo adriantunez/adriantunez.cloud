@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'web/**'
-      - '.github/hugo.yml'
+      - '.github/workflows/hugo.yml'
   # TODO: Add staging here
   # push:
   #   branches:
@@ -13,7 +13,7 @@ on:
     types: [created]
     paths:
       - 'web/**'
-      - '.github/hugo.yml'
+      - '.github/workflows/hugo.yml'
 
 permissions:
   id-token: write
