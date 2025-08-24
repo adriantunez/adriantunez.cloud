@@ -17,6 +17,7 @@ env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   NODE_PATH: ./infrastructure
   AUDIT_LEVEL: moderate
+  AUDIT_SUMMARY_FILE: audit-summary.txt
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
