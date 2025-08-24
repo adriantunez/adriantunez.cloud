@@ -92,8 +92,8 @@ jobs:
         cdk_environments: [prod]
         # cdk_environments: [stag, prod]
     env:
-      AWS_S3_WEB_BUCKET: ${{ secrets.AWS_S3_WEB_BUCKET }} # FIXME: This is problematic to make it env dependant
-      AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} # FIXME: This is problematic to make it env dependant
+      AWS_S3_WEB_BUCKET: ${{ secrets.AWS_S3_WEB_BUCKET }}
+      AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
     defaults:
       run:
         working-directory: "${{ env.INFRA_PATH }}"
