@@ -61,7 +61,7 @@ jobs:
     needs: build
     if: github.event_name == 'release'
     environment:
-      name: production
+      name: prod
       url: https://adriantunez.cloud
     steps:
       - name: Download Hugo artifact
