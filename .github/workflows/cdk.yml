@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: "${{ env.INFRA_PATH }}"
+        working-directory: ${{ env.INFRA_PATH }}
     steps:
       - name: Checkout code
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: "${{ env.INFRA_PATH }}"
+        working-directory: ${{ env.INFRA_PATH }}
     steps:
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
@@ -96,7 +96,7 @@ jobs:
       AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
     defaults:
       run:
-        working-directory: "${{ env.INFRA_PATH }}"
+        working-directory: ${{ env.INFRA_PATH }}
     steps:
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
@@ -141,7 +141,7 @@ jobs:
     if: github.event_name == 'release'
     defaults:
       run:
-        working-directory: "${{ env.INFRA_PATH }}"
+        working-directory: ${{ env.INFRA_PATH }}
     env:
       CDK_ENVIRONMENT: prod
       AWS_S3_WEB_BUCKET: ${{ secrets.AWS_S3_WEB_BUCKET }}
