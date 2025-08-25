@@ -72,7 +72,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}
-          role-session-name: hugo-${{ matrix.cdk_environments }}-deploy
+          role-session-name: hugo-prod-deploy
           aws-region: eu-west-1
           role-duration-seconds: 7200
 

@@ -50,7 +50,7 @@ export const envConfig: Config = {
     },
     oidcSubjectsWeb: {
       deploy: [
-        `repo:${process.env.GITHUB_REPOSITORY}:environment:prod-web}`,
+        `repo:${process.env.GITHUB_REPOSITORY}:environment:prod-web`,
       ]
     },
     web: {
