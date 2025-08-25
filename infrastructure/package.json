@@ -12,8 +12,8 @@
     "cdk:bootstrap:prod": "cdk bootstrap --context environment=prod",
     "cdk:synth:prod": "cdk synth --context environment=prod",
     "cdk:diff:prod": "cdk diff --context environment=prod",
-    "cdk:deploy:prod": "cdk deploy --all --context environment=prod",
-    "cdk:destroy:prod": "cdk destroy --all --context environment=prod"
+    "cdk:deploy:prod": "cdk deploy --all --require-approval never --context environment=prod",
+    "cdk:destroy:prod": "cdk destroy --all --force --context environment=prod"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
