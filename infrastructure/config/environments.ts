@@ -13,15 +13,18 @@ export type OidcSubjects = {
   deploy: string[];
 }
 
+export type WebHosting = {
+  domainNames: string[];
+  certificateId: string;
+  hostedZoneName: string;
+};
+
 export type EnvironmentConfig = {
   currEnv: Environment;
   awsConfig: ResourceEnvironment;
   oidcSubjectsCdk: OidcSubjects;
   oidcSubjectsWeb: OidcSubjects;
-  web: {
-    bucketName: string;
-    distributionId: string;
-  };
+  webHosting: WebHosting;
 };
 
 export type Config = Record<Environment, EnvironmentConfig>;
@@ -53,9 +56,10 @@ export const envConfig: Config = {
         `repo:${process.env.GITHUB_REPOSITORY}:environment:prod-web`,
       ]
     },
-    web: {
-      bucketName: process.env.AWS_S3_WEB_BUCKET || '', // Fail if not defined in code
-      distributionId: process.env.AWS_CLOUDFRONT_DISTRIBUTION_ID || '', // Fail if not defined in code
+    webHosting: {
+      domainNames: process.env.WEB_DOMAIN_NAMES?.split(",") || [],
+      certificateId: process.env.AWS_ACM_CERTIFICATE_ID || '', // Fail if not defined in code,
+      hostedZoneName: "adriantunez.cloud",
     }
   }
 };

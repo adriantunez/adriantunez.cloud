@@ -27,36 +27,38 @@ export class OidcWebRolesStack extends Stack {
         envName: props.currEnv,
       });
 
-      // Validate required web config
-      if (!props.bucketName) {
-        throw new Error(
-          "Missing S3 bucket name for web deploy. Set AWS_S3_WEB_BUCKET or provide web.bucketName in envConfig."
-        );
-      }
-      
-      if (!props.distributionId) {
-        throw new Error(
-          "Missing CloudFront distribution ID for web deploy. Set AWS_CLOUDFRONT_DISTRIBUTION_ID or provide web.distributionId in envConfig."
-        );
-      }
-
-      const bucketArn = `arn:aws:s3:::${props.bucketName}`;
-      const bucketObjectsArn = `arn:aws:s3:::${props.bucketName}/*`;
-      const cfArn = `arn:aws:cloudfront::${props.env?.account}:distribution/${props.distributionId}`;
-
-      // Broad S3 permissions (sync with --delete)
       role.addToPolicy(new PolicyStatement({
         effect: Effect.ALLOW,
-        resources: [bucketArn, bucketObjectsArn],
+        resources: [
+          `arn:aws:s3:::${props.bucketName}`, 
+          `arn:aws:s3:::${props.bucketName}/*`,
+        ],
         actions: ['s3:*'],
       }));
 
       // CloudFront invalidation permissions
       role.addToPolicy(new PolicyStatement({
         effect: Effect.ALLOW,
-        resources: [cfArn],
-        actions: ['cloudfront:CreateInvalidation'], // or 'cloudfront:*' if you want broader
+        resources: [`arn:aws:cloudfront::${props.env?.account}:distribution/${props.distributionId}`],
+        actions: ['cloudfront:CreateInvalidation'],
       }));
+
+      // TODO: Fixme with a simpler approach:
+      // webBucketParam.grantRead(role);
+      // distIdParam.grantRead(role);
+
+      // Add SSM Parameter Store read permissions
+      role.addToPolicy(new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            'ssm:GetParameter',
+            'ssm:GetParameters',
+            'ssm:GetParametersByPath',
+            'ssm:DescribeParameters'
+          ],
+          resources: ["*"],
+        })
+      );
     }
 
     // Tag all resources created by the construct (using globalTags)

@@ -4,6 +4,8 @@ import { OIDCProviderStack } from '../lib/oidc-provider-stack';
 import { OidcCdkRolesStack } from '../lib/oidc-cdk-roles-stack';
 import { OidcWebRolesStack } from '../lib/oidc-web-roles-stack';
 
+// FIXME: Fix tests after managing infrastructure code via CDK
+
 // OIDCProviderStack tests
 describe('Basic init OIDCProviderStack test for all environments', () => {
   Object.values(Environment).forEach((env) => {

@@ -4,6 +4,7 @@ import { envConfig, Environment, globalTags } from '../config/environments';
 import { OIDCProviderStack } from '../lib/oidc-provider-stack';
 import { OidcCdkRolesStack } from '../lib/oidc-cdk-roles-stack';
 import { OidcWebRolesStack } from '../lib/oidc-web-roles-stack';
+import { WebHostingStack } from '../lib/web-hosting-stack';
 
 const app = new App();
 const currEnv = app.node.tryGetContext("environment") as Environment || Environment.PROD;
@@ -34,13 +35,21 @@ new OidcCdkRolesStack(app, `OidcCdkRolesStack-${cfg.currEnv}`, {
   oidcSubjects: cfg.oidcSubjectsCdk,
 });
 
-// Create web OIDC Roles (diff and deploy) to be used by any app that relies on web
+// Create web hosting
+const webHostingStack = new WebHostingStack(app, `WebHostingStack-${cfg.currEnv}`, {
+  env: cfg.awsConfig,
+  currEnv: cfg.currEnv,
+  globalTags: customTags,
+  webHosting: cfg.webHosting,
+});
+
+// Create web OIDC Roles (diff and deploy) to be used by any app that relies on webHosting
 new OidcWebRolesStack(app, `OidcWebRolesStack-${cfg.currEnv}`, {
   env: cfg.awsConfig,
   currEnv: cfg.currEnv,
   globalTags: customTags,
   oidcProviderArn: oidcProviderStack.ghOidcProviderArn,
   oidcSubjects: cfg.oidcSubjectsWeb,
-  bucketName: cfg.web.bucketName,
-  distributionId: cfg.web.distributionId,
+  bucketName: webHostingStack.bucketName,
+  distributionId: webHostingStack.cfnDistributionId,
 });
