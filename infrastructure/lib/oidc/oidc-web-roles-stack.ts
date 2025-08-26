@@ -1,7 +1,7 @@
 import { Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { OidcSubjects, type Environment, type GlobalTags } from '../config/environments';
-import { createIamRole } from '../config/utils';
+import { OidcSubjects, type Environment, type GlobalTags } from '../../config/environments';
+import { createIamRole } from '../../config/utils';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 interface OidcWebRolesStackProps extends StackProps {

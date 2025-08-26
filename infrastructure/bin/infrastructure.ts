@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { App } from 'aws-cdk-lib';
 import { envConfig, Environment, globalTags } from '../config/environments';
-import { OIDCProviderStack } from '../lib/oidc-provider-stack';
-import { OidcCdkRolesStack } from '../lib/oidc-cdk-roles-stack';
-import { OidcWebRolesStack } from '../lib/oidc-web-roles-stack';
-import { WebHostingStack } from '../lib/web-hosting-stack';
+import { OIDCProviderStack } from '../lib/oidc/oidc-provider-stack';
+import { OidcCdkRolesStack } from '../lib/oidc/oidc-cdk-roles-stack';
+import { OidcWebRolesStack } from '../lib/oidc/oidc-web-roles-stack';
+import { WebHostingStack } from '../lib/web-hosting/web-hosting-stack';
 
 const app = new App();
 const currEnv = app.node.tryGetContext("environment") as Environment || Environment.PROD;

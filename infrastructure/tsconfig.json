@@ -22,10 +22,18 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "outDir": "dist",
   },
+  "include": [
+    "bin",
+    "lib",
+    "config",
+    "functions/**/*.d.ts",
+  ],
   "exclude": [
+    "dist",
     "node_modules",
-    "cdk.out"
+    "cdk.out",
   ]
 }

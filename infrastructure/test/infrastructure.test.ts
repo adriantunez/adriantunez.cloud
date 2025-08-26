@@ -1,8 +1,8 @@
 import { App } from 'aws-cdk-lib';
 import { Environment, envConfig, globalTags } from '../config/environments';
-import { OIDCProviderStack } from '../lib/oidc-provider-stack';
-import { OidcCdkRolesStack } from '../lib/oidc-cdk-roles-stack';
-import { OidcWebRolesStack } from '../lib/oidc-web-roles-stack';
+import { OIDCProviderStack } from '../lib/oidc/oidc-provider-stack';
+import { OidcCdkRolesStack } from '../lib/oidc/oidc-cdk-roles-stack';
+import { OidcWebRolesStack } from '../lib/oidc/oidc-web-roles-stack';
 
 // FIXME: Fix tests after managing infrastructure code via CDK
 

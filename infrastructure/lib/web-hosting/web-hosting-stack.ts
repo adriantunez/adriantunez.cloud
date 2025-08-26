@@ -1,15 +1,15 @@
 import { Duration, RemovalPolicy, Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { WebHosting, type Environment, type GlobalTags } from '../config/environments';
+import { WebHosting, type Environment, type GlobalTags } from '../../config/environments';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { AllowedMethods, CachePolicy, Distribution, HeadersFrameOption, HeadersReferrerPolicy, PriceClass, ResponseHeadersPolicy, ViewerProtocolPolicy, Function as CloudFrontFunction, FunctionCode, FunctionEventType, FunctionRuntime, } from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
-import path = require('path');
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { readFileSync } from 'fs';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
+import path = require('path');
 
 interface WebHostingStackProps extends StackProps {
   currEnv: Environment;
@@ -17,6 +17,7 @@ interface WebHostingStackProps extends StackProps {
   webHosting: WebHosting;
 };
 
+// TODO: Refactor to make it simpler and easily understandable
 export class WebHostingStack extends Stack {
 
   public readonly bucketName: string;
@@ -81,7 +82,7 @@ export class WebHostingStack extends Stack {
         customHeaders: [
           {
             header: "Cache-Control",
-            value: "max-age=43200, public",
+            value: `max-age=${Duration.hours(12).toSeconds()}, public`, // CloudFront cache for all s3 objects
             override: true,
           },
         ],
@@ -91,15 +92,14 @@ export class WebHostingStack extends Stack {
       ],
   });
 
+    const cfFunctionPlaceholder = readFileSync(path.join(__dirname, "../../functions/cf-webredirect.js"), "utf8");
+    const cfFunctionCode = cfFunctionPlaceholder.replace('%%DESIRED_DOMAIN%%', props.webHosting.mainDomainName);
     const webRedirectFunction = new CloudFrontFunction(this, "WebRedirectFn", {
-      functionName: "webredirect",
       runtime: FunctionRuntime.JS_2_0,
-      // Trick to enforce CDK to compare strings and avoid redeploying if nothing changed
-      code: FunctionCode.fromInline(readFileSync(path.join(__dirname, "../functions/cf-webredirect.js"), "utf8")),
+      code: FunctionCode.fromInline(cfFunctionCode),
     });
 
-    // TODO: Create certificate from another CDK stack (in us-east-1)
-    // Get certificate created in us-east-1 via clickops
+    // Certificate is shared between several apps. Get it here
     const cert = Certificate.fromCertificateArn(this, "ImportedCert", 
       `arn:aws:acm:us-east-1:${props.env?.account}:certificate/${props.webHosting.certificateId}`,
     );
@@ -154,15 +154,18 @@ export class WebHostingStack extends Stack {
       });
     });
 
+    // Export SSM Parameter Store values
+    const ssmPrefix = `/web/${props.currEnv}`;
+
     // Export BucketName into SSM Parameter Store
     new StringParameter(this, "WebS3BucketNameParam", {
-      parameterName: `/web/${props.currEnv}/bucketName`,
+      parameterName: `${ssmPrefix}/bucketName`,
       stringValue: bucket.bucketName,
     });
 
     // Export CloudFront distributionId into SSM Parameter Store
     new StringParameter(this, "WebCdnDistributionIdParam", {
-      parameterName: `/web/${props.currEnv}/distributionId`,
+      parameterName: `${ssmPrefix}/distributionId`,
       stringValue: dist.distributionId,
     });
 

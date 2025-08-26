@@ -14,6 +14,7 @@ export type OidcSubjects = {
 }
 
 export type WebHosting = {
+  mainDomainName: string;
   domainNames: string[];
   certificateId: string;
   hostedZoneName: string;
@@ -57,9 +58,11 @@ export const envConfig: Config = {
       ]
     },
     webHosting: {
+      mainDomainName: "staging.adriantunez.cloud",
       domainNames: process.env.WEB_DOMAIN_NAMES?.split(",") || [],
       certificateId: process.env.AWS_ACM_CERTIFICATE_ID || '', // Fail if not defined in code,
       hostedZoneName: "adriantunez.cloud",
+      // ssmPrefix: `/web/${Environment.PROD}`,
     }
   }
 };

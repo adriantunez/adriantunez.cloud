@@ -2,7 +2,7 @@ import { Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { OpenIdConnectProvider } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
-import type { Environment, GlobalTags } from '../config/environments';
+import type { Environment, GlobalTags } from '../../config/environments';
 
 interface OIDCProviderStackProps extends StackProps {
   currEnv: Environment;
