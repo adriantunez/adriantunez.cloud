@@ -14,8 +14,7 @@
     "cdk:diff:prod": "cdk diff --context environment=prod",
     "cdk:deploy:prod": "cdk deploy --all --require-approval never --context environment=prod",
     "cdk:destroy:prod": "cdk destroy --all --force --context environment=prod",
-    "format": "prettier --write .",
-    "prepare": "husky"
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
