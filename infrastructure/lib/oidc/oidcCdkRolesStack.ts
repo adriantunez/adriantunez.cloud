@@ -1,14 +1,18 @@
-import { Stack, StackProps, Tags } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import { OidcSubjects, type Environment, type GlobalTags } from '../../config/environments';
-import { createIamRole } from '../../config/utils';
+import { Stack, StackProps, Tags } from "aws-cdk-lib";
+import { Construct } from "constructs";
+import {
+  OidcSubjects,
+  type Environment,
+  type GlobalTags,
+} from "../../config/environments";
+import { createIamRole } from "../../config/utils";
 
 interface OidcCdkRolesStackProps extends StackProps {
   currEnv: Environment;
   globalTags: GlobalTags;
   oidcProviderArn: string;
   oidcSubjects: OidcSubjects;
-};
+}
 
 export class OidcCdkRolesStack extends Stack {
   constructor(scope: Construct, id: string, props: OidcCdkRolesStackProps) {
@@ -34,9 +38,7 @@ export class OidcCdkRolesStack extends Stack {
       createIamRole(this, "DeployOidcCdkRole", {
         oidcProviderArn: props.oidcProviderArn,
         subjectArray: props.oidcSubjects.deploy,
-        resourcesArray: [
-          `arn:aws:iam::${props.env?.account}:role/cdk-*`
-        ],
+        resourcesArray: [`arn:aws:iam::${props.env?.account}:role/cdk-*`],
         roleName: "DeployOidcCdkRole",
         envName: props.currEnv,
       });
@@ -46,7 +48,5 @@ export class OidcCdkRolesStack extends Stack {
     Object.entries(props.globalTags).forEach(([key, value]) => {
       Tags.of(this).add(key, value);
     });
-  };
-
-  
-};
+  }
+}

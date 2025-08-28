@@ -1,30 +1,35 @@
 #!/usr/bin/env node
-import { App } from 'aws-cdk-lib';
-import { envConfig, Environment, globalTags } from '../config/environments';
-import { OIDCProviderStack } from '../lib/oidc/oidc-provider-stack';
-import { OidcCdkRolesStack } from '../lib/oidc/oidc-cdk-roles-stack';
-import { OidcWebRolesStack } from '../lib/oidc/oidc-web-roles-stack';
-import { WebHostingStack } from '../lib/web-hosting/web-hosting-stack';
+import { App } from "aws-cdk-lib";
+import { envConfig, Environment, globalTags } from "../config/environments";
+import { OIDCProviderStack } from "../lib/oidc/oidcProviderStack";
+import { OidcCdkRolesStack } from "../lib/oidc/oidcCdkRolesStack";
+import { OidcWebRolesStack } from "../lib/oidc/oidcWebRolesStack";
+import { WebHostingStack } from "../lib/web-hosting/webHostingStack";
 
 const app = new App();
-const currEnv = app.node.tryGetContext("environment") as Environment || Environment.PROD;
-const cfg = envConfig[currEnv]
+const currEnv =
+  (app.node.tryGetContext("environment") as Environment) || Environment.PROD;
+const cfg = envConfig[currEnv];
 
 console.log("Selected config:");
 console.log(cfg);
 
 // Supercharge tags with env-specific ones
-const customTags = { 
-  ...globalTags, 
+const customTags = {
+  ...globalTags,
   Environment: currEnv,
 };
 
 // Create OIDC providers
-const oidcProviderStack = new OIDCProviderStack(app, `OIDCProviderStack-${cfg.currEnv}`, {
-  env: cfg.awsConfig,
-  currEnv: cfg.currEnv,
-  globalTags: customTags,
-});
+const oidcProviderStack = new OIDCProviderStack(
+  app,
+  `OIDCProviderStack-${cfg.currEnv}`,
+  {
+    env: cfg.awsConfig,
+    currEnv: cfg.currEnv,
+    globalTags: customTags,
+  },
+);
 
 // Create CDK OIDC Roles (diff and deploy) to be used by any app that relies on CDK
 new OidcCdkRolesStack(app, `OidcCdkRolesStack-${cfg.currEnv}`, {
@@ -36,7 +41,7 @@ new OidcCdkRolesStack(app, `OidcCdkRolesStack-${cfg.currEnv}`, {
 });
 
 // Create web hosting
-const webHostingStack = new WebHostingStack(app, `WebHostingStack-${cfg.currEnv}`, {
+new WebHostingStack(app, `WebHostingStack-${cfg.currEnv}`, {
   env: cfg.awsConfig,
   currEnv: cfg.currEnv,
   globalTags: customTags,
@@ -50,6 +55,5 @@ new OidcWebRolesStack(app, `OidcWebRolesStack-${cfg.currEnv}`, {
   globalTags: customTags,
   oidcProviderArn: oidcProviderStack.ghOidcProviderArn,
   oidcSubjects: cfg.oidcSubjectsWeb,
-  bucketName: webHostingStack.bucketName,
-  distributionId: webHostingStack.cfnDistributionId,
+  stringParameterNames: cfg.webHosting.ssmStringParameterNames,
 });
