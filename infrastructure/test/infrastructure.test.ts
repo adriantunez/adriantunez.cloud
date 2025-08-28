@@ -1,10 +1,9 @@
 import { App } from "aws-cdk-lib";
 import { Environment, envConfig, globalTags } from "../config/environments";
-import { OIDCProviderStack } from "../lib/oidc/oidc-provider-stack";
-import { OidcCdkRolesStack } from "../lib/oidc/oidc-cdk-roles-stack";
-import { OidcWebRolesStack } from "../lib/oidc/oidc-web-roles-stack";
-
-// FIXME: Fix tests after managing infrastructure code via CDK
+import { OIDCProviderStack } from "../lib/oidc/oidcProviderStack";
+import { OidcCdkRolesStack } from "../lib/oidc/oidcCdkRolesStack";
+import { WebHostingStack } from "../lib/web-hosting/webHostingStack";
+import { OidcWebRolesStack } from "../lib/oidc/oidcWebRolesStack";
 
 // OIDCProviderStack tests
 describe("Basic init OIDCProviderStack test for all environments", () => {
@@ -44,6 +43,33 @@ describe("Basic init OidcCdkRolesStack test for all environments", () => {
   });
 });
 
+// WebHostingStack tests
+describe("Basic init WebHostingStack test for all environments", () => {
+  Object.values(Environment).forEach((env) => {
+    test(`Test init of WebHostingStack for ${env} env`, () => {
+      const app = new App();
+      const cfg = envConfig[env];
+
+      const testStringParameterNames = {
+        bucketName: "myBucketStringParameterName",
+        distributionId: "myDistributionIdParameterName",
+      };
+
+      // override webHosting.ssmStringParameterNames
+      cfg.webHosting.ssmStringParameterNames = testStringParameterNames;
+
+      const stack = new WebHostingStack(app, `MyStack-${cfg.currEnv}`, {
+        env: cfg.awsConfig,
+        currEnv: cfg.currEnv,
+        globalTags: globalTags,
+        webHosting: cfg.webHosting,
+      });
+
+      expect(stack).toBeDefined();
+    });
+  });
+});
+
 // OidcWebRolesStack tests
 describe("Basic init OidcWebRolesStack test for all environments", () => {
   Object.values(Environment).forEach((env) => {
@@ -51,14 +77,18 @@ describe("Basic init OidcWebRolesStack test for all environments", () => {
       const app = new App();
       const cfg = envConfig[env];
 
+      const testStringParameterNames = {
+        bucketName: "myBucketStringParameterName",
+        distributionId: "myDistributionIdParameterName",
+      };
+
       const stack = new OidcWebRolesStack(app, `MyStack-${cfg.currEnv}`, {
         env: cfg.awsConfig,
         currEnv: cfg.currEnv,
         globalTags: globalTags,
         oidcProviderArn: `arn:aws:iam::${cfg.awsConfig.account}:oidc-provider/token.actions.githubusercontent.com`,
         oidcSubjects: cfg.oidcSubjectsWeb,
-        bucketName: "myOwnTestBucket",
-        distributionId: "E2ABCDEF123456",
+        stringParameterNames: testStringParameterNames,
       });
 
       expect(stack).toBeDefined();
