@@ -1,3 +1,13 @@
+import { config } from "dotenv";
+import { existsSync } from "fs";
+import { resolve } from "path";
+
+// Load env variables from .env if present (easier for development)
+const envPath = resolve(process.cwd(), ".env");
+if (existsSync(envPath)) {
+  config({ path: envPath });
+}
+
 import type { ResourceEnvironment } from "aws-cdk-lib";
 
 export enum Environment {
@@ -62,7 +72,7 @@ export const envConfig: Config = {
       deploy: [`repo:${process.env.GITHUB_REPOSITORY}:environment:prod-web`],
     },
     webHosting: {
-      mainDomainName: "staging.adriantunez.cloud",
+      mainDomainName: process.env.WEB_MAIN_DOMAIN_NAME || "", // Fail if not defined in code
       domainNames: process.env.WEB_DOMAIN_NAMES?.split(",") || [],
       certificateId: process.env.AWS_ACM_CERTIFICATE_ID || "", // Fail if not defined in code
       hostedZoneName: "adriantunez.cloud",
