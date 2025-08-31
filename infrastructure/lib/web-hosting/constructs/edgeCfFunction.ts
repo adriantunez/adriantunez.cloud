@@ -8,7 +8,7 @@ import { readFileSync } from "fs";
 import path = require("path");
 
 export interface EdgeCfFunctionProps {
-  functionPath: string;
+  functionRelPath: string;
   mainDomainName: string;
 }
 
@@ -19,12 +19,12 @@ export class EdgeCfFunction extends Construct {
     super(scope, id);
 
     const cfFunctionPlaceholder = readFileSync(
-      path.join(__dirname, props.functionPath),
-      "utf8",
+      path.join(process.cwd(), props.functionRelPath),
+      "utf8"
     );
     const cfFunctionCode = cfFunctionPlaceholder.replace(
       "%%DESIRED_DOMAIN%%",
-      props.mainDomainName,
+      props.mainDomainName
     );
 
     this.cfFunction = new CloudFrontFunction(this, "WebRedirectFn", {

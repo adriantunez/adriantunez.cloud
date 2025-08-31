@@ -10,6 +10,7 @@ import { EdgeCfFunction } from "./constructs/edgeCfFunction";
 import { DnsAliasesDistId } from "./constructs/dnsAliasesDistId";
 import { cdnStaticBucket } from "./constructs/cdnStaticBucket";
 import { SsmWebHostingOutputs } from "./constructs/SsmWebHostingOutputs";
+// import path = require("path");
 
 interface WebHostingStackProps extends StackProps {
   currEnv: Environment;
@@ -26,7 +27,7 @@ export class WebHostingStack extends Stack {
 
     // Create the Edge Redirect Function for CloudFront
     const edgeCfFunction = new EdgeCfFunction(this, "EdgeCfFunction", {
-      functionPath: "../../../functions/cf-webredirect.js",
+      functionRelPath: "functions/cf-webredirect.js",
       mainDomainName: props.webHosting.mainDomainName,
     });
 
