@@ -1,8 +1,0 @@
-# TODO: If I want to execute first cdk and then hugo deployment and share values, I need to do it all in a GHA single workflow
-# Also to take into consideration precedences
-# And also dispatcher and all-good job for PRs
-# Probably also for staging? If so
-  # Matrix for PR for staging & prod
-  # TODO: Check how to change domain in cf-webredirect.js
-  # TODO: How to get bucket names and CF distribution IDs?? -> SSM Parameter Store is a good approach I think
-  #       Get SSM Parameter store names from env vars, based on the current environment. This does the trick!

@@ -1,0 +1,75 @@
+name: reusable-cdk-diff
+
+on:
+  workflow_call:
+    inputs:
+      CDK_ENVIRONMENT:
+        description: "Define CDK environment"
+        type: string
+        required: true
+      MAIN_DOMAIN_NAME:
+        description: "Define web main domain name"
+        type: string
+        required: true
+      WEB_DOMAIN_NAMES:
+        description: "Define web domain names"
+        type: string
+        required: true
+      WEB_SSM_SP_BUCKET_NAME:
+        description: "Define web SSM parameter store bucket name"
+        type: string
+        required: true
+      WEB_SSM_SP_DISTRIBUTION_ID:
+        description: "Define web SSM parameter store distribution ID"
+        type: string
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  CDK_DISABLE_CLI_TELEMETRY: true
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  WEB_DOMAIN_NAMES: ${{ inputs.WEB_DOMAIN_NAMES }}
+  AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
+  WEB_SSM_SP_BUCKET_NAME: ${{ inputs.WEB_SSM_SP_BUCKET_NAME }}
+  WEB_SSM_SP_DISTRIBUTION_ID: ${{ inputs.WEB_SSM_SP_DISTRIBUTION_ID }}
+
+jobs:
+  diff:
+    name: diff
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ vars.INFRA_PATH }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # was: actions/setup-node@v4
+        with:
+          node-version-file: "${{ vars.INFRA_PATH }}/.nvmrc"
+          cache: npm
+          cache-dependency-path: "${{ vars.INFRA_PATH }}/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build node
+        run: npm run build
+
+      - name: Short-living AWS credentials from OIDC token and role
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CDK_OIDC_ASSUME_ROLE }}
+          role-session-name: cdk-${{ inputs.CDK_ENVIRONMENT }}-diff
+          aws-region: eu-west-1
+          role-duration-seconds: 7200
+
+      - name: Run cdk synth
+        run: npm run cdk:synth:${{ inputs.CDK_ENVIRONMENT }}
+
+      - name: Run cdk diff
+        run: npm run cdk:diff:${{ inputs.CDK_ENVIRONMENT }}

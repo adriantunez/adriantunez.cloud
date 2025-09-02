@@ -1,0 +1,93 @@
+name: reusable-hugo
+
+on:
+  workflow_call:
+    inputs:
+      GHA_ENVIRONMENT:
+        description: "Define GitHub Actions environment (empty: no deploy)"
+        type: string
+        default: ""
+      WEB_MAIN_DOMAIN_NAME:
+        description: "Define Hugo base URL"
+        type: string
+        required: true
+      WEB_SSM_SP_BUCKET_NAME:
+        description: "Define SSM parameter for web S3 bucket name"
+        type: string
+        required: true
+      WEB_SSM_SP_DISTRIBUTION_ID:
+        description: "Define SSM parameter for web CloudFront distribution ID"
+        type: string
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  HUGO_VERSION: "0.148.2"
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ vars.HUGO_PATH }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+        with:
+          submodules: recursive # get hugo theme submodule
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # was: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: ${{ env.HUGO_VERSION }}
+
+      - name: Build Hugo site
+        run: hugo --minify -d output/ --baseURL ${{ inputs.WEB_MAIN_DOMAIN_NAME }}
+
+      - name: Upload Hugo artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # was: actions/upload-artifact@v3
+        if: ${{ inputs.GHA_ENVIRONMENT }}
+        with:
+          name: hugo-site
+          path: ${{ vars.HUGO_PATH }}/output/
+
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ inputs.GHA_ENVIRONMENT }}
+    environment:
+      name: ${{ inputs.GHA_ENVIRONMENT }}
+      url: ${{ inputs.WEB_MAIN_DOMAIN_NAME }}
+    steps:
+      - name: Download Hugo artifact
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # was: actions/download-artifact@v3
+        with:
+          name: hugo-site
+          path: ${{ vars.HUGO_PATH }}/output/
+
+      - name: Configure AWS credentials for deployment
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ASSUME_ROLE }}
+          role-session-name: hugo-${{ inputs.GHA_ENVIRONMENT }}
+          aws-region: eu-west-1
+          role-duration-seconds: 7200
+
+      - name: Read SSM params (bucket & distribution)
+        id: ssm
+        run: |
+          BUCKET_NAME=$(aws ssm get-parameter --name "${{ inputs.WEB_SSM_SP_BUCKET_NAME }}" --query 'Parameter.Value' --output text)
+          DIST_ID=$(aws ssm get-parameter --name "${{ inputs.WEB_SSM_SP_DISTRIBUTION_ID }}" --query 'Parameter.Value' --output text)
+
+          echo "bucket=${BUCKET_NAME}" >> "$GITHUB_OUTPUT"
+          echo "distribution_id=${DIST_ID}" >> "$GITHUB_OUTPUT"
+      - name: Push to S3
+        run: aws s3 sync ${{ vars.HUGO_PATH }}/output/ s3://${{ steps.ssm.outputs.bucket }}/ --delete
+
+      - name: Invalidate CloudFront CDN
+        run: aws cloudfront create-invalidation --distribution-id ${{ steps.ssm.outputs.distribution_id }} --paths "/*"

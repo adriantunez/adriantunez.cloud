@@ -1,0 +1,68 @@
+name: PR Workflow
+
+on:
+  pull_request:
+    paths:
+      - "infrastructure/**"
+      - "web/**"
+      - ".github/workflows/**"
+
+# TODO: Change from paths to all + diff + all-good
+# TODO: Review GHA permissions
+
+concurrency:
+  group: pr-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true # only cancel in-progress runs for PRs
+
+jobs:
+  # Just run a single test. It internally checks all envs
+  cdk_tests:
+    uses: ./.github/workflows/reusable-cdk-tests.yml
+    with:
+      AUDIT_LEVEL: moderate
+
+  # Matrix to allow testing diff in all environments
+  cdk_diff:
+    uses: ./.github/workflows/reusable-cdk-diff.yml
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # FIXME: This is just temporary, change it accordingly
+          - cdk_environment: prod
+            web_main_domain_name: staging.adriantunez.cloud
+            web_domain_names: staging.adriantunez.cloud,www-staging.adriantunez.cloud
+    with:
+      CDK_ENVIRONMENT: ${{ matrix.cdk_environment }}
+      WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
+      WEB_DOMAIN_NAMES: ${{ matrix.web_domain_names }}
+      WEB_SSM_SP_BUCKET_NAME: /web/${{ matrix.cdk_environment }}/bucketName
+      WEB_SSM_SP_DISTRIBUTION_ID: /web/${{ matrix.cdk_environment }}/distributionId
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
+      AWS_CDK_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
+
+  # Matrix to allow testing build in all environments
+  hugo:
+    needs: [cdk_tests, cdk_diff]
+    uses: ./.github/workflows/reusable-hugo.yml
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # FIXME: This is just temporary, change it accordingly
+          - hugo_environment: prod
+            web_main_domain_name: staging.adriantunez.cloud
+    with:
+      WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
+      GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
+
+  all-good:
+    needs: [cdk_tests, cdk_diff, hugo]
+    if: ${{ !cancelled() && needs.cdk_tests.result == 'success' && needs.cdk_diff.result == 'success' && needs.hugo.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
+        if: >-
+          ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
