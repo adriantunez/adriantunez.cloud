@@ -20,7 +20,7 @@ on:
         type: string
         required: false # only required to deploy
     secrets:
-      AWS_CDK_OIDC_ASSUME_ROLE: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}
+      AWS_CDK_OIDC_ASSUME_ROLE:
       required: false # only required to deploy
 
 permissions:
