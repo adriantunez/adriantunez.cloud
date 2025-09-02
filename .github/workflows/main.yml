@@ -28,7 +28,7 @@ jobs:
 
   # We can skip the diff, as deploy it's automated (and was reviewed in PR), but I prefer a fail-fast approach if something's wrong
   cdk_diff:
-    uses: ./github/workflows/reusable-cdk-diff.yml
+    uses: ./.github/workflows/reusable-cdk-diff.yml
     with:
       CDK_ENVIRONMENT: prod
       WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
