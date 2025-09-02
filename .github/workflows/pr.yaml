@@ -43,7 +43,7 @@ jobs:
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
-      AWS_CDK_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
+      AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
 
   # Matrix to allow testing build in all environments
   hugo:
