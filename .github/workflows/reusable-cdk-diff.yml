@@ -28,7 +28,7 @@ on:
         required: true
       AWS_ACM_CERTIFICATE_ID:
         required: true
-      AWS_CDK_OIDC_ASSUME_ROLE:
+      AWS_OIDC_ASSUME_ROLE:
         required: true
 
 permissions:
@@ -38,6 +38,7 @@ permissions:
 env:
   CDK_DISABLE_CLI_TELEMETRY: true
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  WEB_MAIN_DOMAIN_NAME: ${{ inputs.WEB_MAIN_DOMAIN_NAME }}
   WEB_DOMAIN_NAMES: ${{ inputs.WEB_DOMAIN_NAMES }}
   AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
   WEB_SSM_SP_BUCKET_NAME: ${{ inputs.WEB_SSM_SP_BUCKET_NAME }}
@@ -70,7 +71,7 @@ jobs:
       - name: Short-living AWS credentials from OIDC token and role
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_CDK_OIDC_ASSUME_ROLE }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ASSUME_ROLE }}
           role-session-name: cdk-${{ inputs.CDK_ENVIRONMENT }}-diff
           aws-region: eu-west-1
           role-duration-seconds: 7200
