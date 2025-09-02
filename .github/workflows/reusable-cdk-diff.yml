@@ -23,6 +23,13 @@ on:
         description: "Define web SSM parameter store distribution ID"
         type: string
         required: true
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
+      AWS_ACM_CERTIFICATE_ID:
+        required: true
+      AWS_CDK_OIDC_ASSUME_ROLE:
+        required: true
 
 permissions:
   contents: read
