@@ -3,8 +3,8 @@ name: Hugo workflow
 on:
   pull_request:
     paths:
-      - 'web/**'
-      - '.github/workflows/hugo.yml'
+      - "web/**"
+      - ".github/workflows/hugo.yml"
   # TODO: Add staging here
   # push:
   #   branches:
@@ -13,8 +13,9 @@ on:
     types: [created]
 
 permissions:
-  id-token: write
   contents: read
+  id-token: write
+  actions: write
 
 env:
   HUGO_VERSION: 0.148.2
@@ -36,7 +37,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
         with:
-          submodules: recursive  # get hugo theme submodule
+          submodules: recursive # get hugo theme submodule
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # was: peaceiris/actions-hugo@v3

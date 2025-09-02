@@ -1,0 +1,74 @@
+name: Main Branch Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - feature/add-cdk-infrastructure-stacks # FIXME: Remove
+    paths:
+      - "infrastructure/**"
+      - "web/**"
+      - ".github/workflows/**"
+
+concurrency:
+  group: main-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false # only cancel in-progress runs for PRs
+
+env:
+  CDK_ENVIRONMENT: prod
+  WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
+  WEB_DOMAIN_NAMES: staging.adriantunez.cloud,www-staging.adriantunez.cloud
+  WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
+  WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
+
+# TODO: Change from paths to all + diff + all-good
+
+permissions:
+  contents: read
+  id-token: write
+  actions: write
+
+jobs:
+  # Just run a single test. It internally checks all envs
+  cdk-test:
+    uses: ./.github/workflows/reusable-cdk-tests.yml
+    with:
+      AUDIT_LEVEL: moderate
+
+  # We can skip the diff, as deploy it's automated (and was reviewed in PR), but I prefer a fail-fast approach if something's wrong
+  cdk_diff:
+    uses: ./github/workflows/reusable-cdk-diff.yml
+    with:
+      CDK_ENVIRONMENT: ${{ env.CDK_ENVIRONMENT }}
+      WEB_MAIN_DOMAIN_NAME: ${{ env.WEB_MAIN_DOMAIN_NAME }}
+      WEB_DOMAIN_NAMES: ${{ env.WEB_DOMAIN_NAMES }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ env.WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ env.WEB_SSM_SP_DISTRIBUTION_ID }}
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
+      AWS_CDK_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
+
+  cdk_deploy:
+    needs: [cdk_tests, cdk_diff]
+    uses: ./.github/workflows/reusable-cdk-deploy.yml
+    with:
+      CDK_ENVIRONMENT: ${{ env.CDK_ENVIRONMENT }}
+      GHA_ENVIRONMENT: prod-infrastructure
+      WEB_MAIN_DOMAIN_NAME: ${{ env.WEB_MAIN_DOMAIN_NAME }}
+      WEB_DOMAIN_NAMES: ${{ env.WEB_DOMAIN_NAMES }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ env.WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ env.WEB_SSM_SP_DISTRIBUTION_ID }}
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
+      AWS_CDK_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DEPLOY_OIDC_ASSUME_ROLE }}
+
+  hugo:
+    needs: [cdk_tests, cdk_diff]
+    uses: ./.github/workflows/reusable-hugo.yml
+    with:
+      GHA_ENVIRONMENT: prod-web
+      WEB_MAIN_DOMAIN_NAME: ${{ env.WEB_MAIN_DOMAIN_NAME }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ env.WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ env.WEB_SSM_SP_DISTRIBUTION_ID }}

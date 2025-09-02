@@ -25,8 +25,8 @@ on:
         required: true
 
 permissions:
-  id-token: write
   contents: read
+  id-token: write
 
 env:
   CDK_DISABLE_CLI_TELEMETRY: true

@@ -8,7 +8,11 @@ on:
       - ".github/workflows/**"
 
 # TODO: Change from paths to all + diff + all-good
-# TODO: Review GHA permissions
+
+permissions:
+  contents: read
+  id-token: write
+  actions: write
 
 concurrency:
   group: pr-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
