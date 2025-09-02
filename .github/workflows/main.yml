@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   # Just run a single test. It internally checks all envs
-  cdk-test:
+  cdk-tests:
     uses: ./.github/workflows/reusable-cdk-tests.yml
     with:
       AUDIT_LEVEL: moderate
