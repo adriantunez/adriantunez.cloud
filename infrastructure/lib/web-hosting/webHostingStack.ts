@@ -10,7 +10,6 @@ import { EdgeCfFunction } from "./constructs/edgeCfFunction";
 import { DnsAliasesDistId } from "./constructs/dnsAliasesDistId";
 import { cdnStaticBucket } from "./constructs/cdnStaticBucket";
 import { SsmWebHostingOutputs } from "./constructs/SsmWebHostingOutputs";
-// import path = require("path");
 
 interface WebHostingStackProps extends StackProps {
   currEnv: Environment;
