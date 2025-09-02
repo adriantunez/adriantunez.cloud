@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   # Just run a single test. It internally checks all envs
-  cdk-tests:
+  cdk_tests:
     uses: ./.github/workflows/reusable-cdk-tests.yml
     with:
       AUDIT_LEVEL: moderate
@@ -56,7 +56,7 @@ jobs:
       AWS_CDK_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DEPLOY_OIDC_ASSUME_ROLE }}
 
   hugo:
-    needs: [cdk_tests, cdk_diff]
+    needs: [cdk_tests, cdk_deploy]
     uses: ./.github/workflows/reusable-hugo.yml
     with:
       GHA_ENVIRONMENT: prod-web
