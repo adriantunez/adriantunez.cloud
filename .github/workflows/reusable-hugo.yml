@@ -14,11 +14,11 @@ on:
       WEB_SSM_SP_BUCKET_NAME:
         description: "Define SSM parameter for web S3 bucket name"
         type: string
-        required: true
+        required: false # only required to deploy
       WEB_SSM_SP_DISTRIBUTION_ID:
         description: "Define SSM parameter for web CloudFront distribution ID"
         type: string
-        required: true
+        required: false # only required to deploy
 
 permissions:
   id-token: write
