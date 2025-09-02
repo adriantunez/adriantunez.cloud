@@ -11,7 +11,7 @@ on:
         description: "Define GitHub Actions environment"
         type: string
         required: true
-      MAIN_DOMAIN_NAME:
+      WEB_MAIN_DOMAIN_NAME:
         description: "Define web main domain name"
         type: string
         required: true
