@@ -32,7 +32,7 @@ jobs:
     with:
       CDK_ENVIRONMENT: prod
       WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_DOMAIN_NAMES: staging.adriantunez.cloud,www-staging.adriantunez.cloud
+      WEB_DOMAIN_NAMES: staging.adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
@@ -47,7 +47,7 @@ jobs:
       CDK_ENVIRONMENT: prod
       GHA_ENVIRONMENT: prod-infrastructure
       WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_DOMAIN_NAMES: staging.adriantunez.cloud,www-staging.adriantunez.cloud
+      WEB_DOMAIN_NAMES: staging.adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
@@ -63,3 +63,5 @@ jobs:
       WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
+    secrets:
+      AWS_CDK_OIDC_ASSUME_ROLE: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}

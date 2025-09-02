@@ -6,7 +6,7 @@ import {
   type Environment,
   type GlobalTags,
 } from "../../config/environments";
-import { createIamRole } from "../../config/utils";
+import { CreateIamRole } from "./constructs/createIamRole";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
@@ -25,7 +25,7 @@ export class OidcWebRolesStack extends Stack {
 
     // Create Oidc role for web deploy, if defined
     if (props.oidcSubjects.deploy) {
-      const role = createIamRole(this, "DeployOidcWebRole", {
+      const role = CreateIamRole(this, "DeployOidcWebRole", {
         oidcProviderArn: props.oidcProviderArn,
         subjectArray: props.oidcSubjects.deploy,
         resourcesArray: [], // no AssumeRole needed anymore
@@ -37,19 +37,19 @@ export class OidcWebRolesStack extends Stack {
       const spBucketName = StringParameter.fromStringParameterName(
         this,
         "ImportedBucketName",
-        props.stringParameterNames.bucketName,
+        props.stringParameterNames.bucketName
       );
       const spDistributionId = StringParameter.fromStringParameterName(
         this,
         "ImportedDistributionId",
-        props.stringParameterNames.distributionId,
+        props.stringParameterNames.distributionId
       );
 
       // Grant RW access to the web bucket
       const webBucket = Bucket.fromBucketName(
         this,
         "ImportedBucket",
-        spBucketName.stringValue,
+        spBucketName.stringValue
       );
       webBucket.grantReadWrite(role);
 
@@ -60,7 +60,7 @@ export class OidcWebRolesStack extends Stack {
             `arn:aws:cloudfront::${props.env?.account}:distribution/${spDistributionId.stringValue}`,
           ],
           actions: ["cloudfront:CreateInvalidation"],
-        }),
+        })
       );
 
       // Grant RO access to ssmWebHosting parameters

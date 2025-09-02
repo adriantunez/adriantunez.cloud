@@ -5,7 +5,7 @@ import {
   type Environment,
   type GlobalTags,
 } from "../../config/environments";
-import { createIamRole } from "../../config/utils";
+import { CreateIamRole } from "./constructs/createIamRole";
 
 interface OidcCdkRolesStackProps extends StackProps {
   currEnv: Environment;
@@ -20,7 +20,7 @@ export class OidcCdkRolesStack extends Stack {
 
     // Create Oidc role for CDK diff, if defined
     if (props.oidcSubjects.diff) {
-      createIamRole(this, "DiffOidcCdkRole", {
+      CreateIamRole(this, "DiffOidcCdkRole", {
         oidcProviderArn: props.oidcProviderArn,
         subjectArray: props.oidcSubjects.diff,
         resourcesArray: [
@@ -35,7 +35,7 @@ export class OidcCdkRolesStack extends Stack {
 
     // Create Oidc role for CDK deploy, if defined
     if (props.oidcSubjects.deploy) {
-      createIamRole(this, "DeployOidcCdkRole", {
+      CreateIamRole(this, "DeployOidcCdkRole", {
         oidcProviderArn: props.oidcProviderArn,
         subjectArray: props.oidcSubjects.deploy,
         resourcesArray: [`arn:aws:iam::${props.env?.account}:role/cdk-*`],
