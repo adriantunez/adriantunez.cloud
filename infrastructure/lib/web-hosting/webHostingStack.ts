@@ -47,7 +47,8 @@ export class WebHostingStack extends Stack {
 
     // Export SSM Parameter Store created values
     new SsmWebHostingOutputs(this, "SsmWebHostingOutputs", {
-      stringParameterNames: props.webHosting.ssmStringParameterNames,
+      ssmStringParameterNamesWebHosting:
+        props.webHosting.ssmStringParameterNamesWebHosting,
       bucketName: staticBucket.bucket.bucketName,
       distributionId: cdn.distribution.distributionId,
     });

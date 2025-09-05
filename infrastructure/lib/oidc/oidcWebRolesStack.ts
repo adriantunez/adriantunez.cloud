@@ -2,7 +2,7 @@ import { Stack, StackProps, Tags } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import {
   OidcSubjects,
-  SsmStringParameterNames,
+  SsmStringParameterNamesWebHosting,
   type Environment,
   type GlobalTags,
 } from "../../config/environments";
@@ -14,19 +14,26 @@ import { StringParameter } from "aws-cdk-lib/aws-ssm";
 interface OidcWebRolesStackProps extends StackProps {
   currEnv: Environment;
   globalTags: GlobalTags;
-  oidcProviderArn: string;
+  ssmStringParameterProviderArn: string;
   oidcSubjects: OidcSubjects;
-  stringParameterNames: SsmStringParameterNames;
+  ssmStringParameterNamesWebHosting: SsmStringParameterNamesWebHosting;
 }
 
 export class OidcWebRolesStack extends Stack {
   constructor(scope: Construct, id: string, props: OidcWebRolesStackProps) {
     super(scope, id, props);
 
+    // Get Provider ARN from SSM Parameter Store
+    const oidcProviderArn = StringParameter.fromStringParameterName(
+      this,
+      "OidcProviderArn",
+      props.ssmStringParameterProviderArn
+    ).stringValue;
+
     // Create Oidc role for web deploy, if defined
     if (props.oidcSubjects.deploy) {
       const role = CreateIamRole(this, "DeployOidcWebRole", {
-        oidcProviderArn: props.oidcProviderArn,
+        oidcProviderArn: oidcProviderArn,
         subjectArray: props.oidcSubjects.deploy,
         resourcesArray: [], // no AssumeRole needed anymore
         roleName: "DeployOidcWebRole",
@@ -37,12 +44,12 @@ export class OidcWebRolesStack extends Stack {
       const spBucketName = StringParameter.fromStringParameterName(
         this,
         "ImportedBucketName",
-        props.stringParameterNames.bucketName
+        props.ssmStringParameterNamesWebHosting.bucketName
       );
       const spDistributionId = StringParameter.fromStringParameterName(
         this,
         "ImportedDistributionId",
-        props.stringParameterNames.distributionId
+        props.ssmStringParameterNamesWebHosting.distributionId
       );
 
       // Grant RW access to the web bucket

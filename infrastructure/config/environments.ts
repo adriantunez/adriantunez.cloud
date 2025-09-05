@@ -19,14 +19,19 @@ export type GlobalTags = {
   [key: string]: string;
 };
 
-export type OidcSubjects = {
-  diff?: string[];
-  deploy: string[];
+export type SsmStringParameterNamesWebHosting = {
+  bucketName: string;
+  distributionId: string;
 };
 
 export type SsmStringParameterNames = {
-  bucketName: string;
-  distributionId: string;
+  providerArn: string;
+  webHosting: SsmStringParameterNamesWebHosting;
+};
+
+export type OidcSubjects = {
+  diff?: string[];
+  deploy?: string[];
 };
 
 export type WebHosting = {
@@ -34,12 +39,13 @@ export type WebHosting = {
   domainNames: string[];
   certificateId: string;
   hostedZoneName: string;
-  ssmStringParameterNames: SsmStringParameterNames;
+  ssmStringParameterNamesWebHosting: SsmStringParameterNamesWebHosting;
 };
 
 export type EnvironmentConfig = {
   currEnv: Environment;
   awsConfig: ResourceEnvironment;
+  ssmStringParameterProviderArn: string;
   oidcSubjectsCdk: OidcSubjects;
   oidcSubjectsWeb: OidcSubjects;
   webHosting: WebHosting;
@@ -65,25 +71,53 @@ const sharedConfig = {
     region: "eu-west-1",
     account: checkEnvVar("AWS_ACCOUNT_ID"),
   },
+  ssmStringParameterNames: {
+    providerArn: "/providers/github/oidc/arn",
+    webHosting: {
+      bucketName: checkEnvVar("WEB_SSM_SP_BUCKET_NAME"),
+      distributionId: checkEnvVar("WEB_SSM_SP_DISTRIBUTION_ID"),
+    },
+  },
   oidcSubjectsCdk: {
     diff: [`repo:${checkEnvVar("GITHUB_REPOSITORY")}:*`],
+    deploy: [], // To be filled per environment
   },
   webHosting: {
     mainDomainName: checkEnvVar("WEB_MAIN_DOMAIN_NAME"),
     domainNames: checkEnvVar("WEB_DOMAIN_NAMES").split(","),
     certificateId: checkEnvVar("AWS_ACM_CERTIFICATE_ID"),
-    hostedZoneName: "adriantunez.cloud",
-    ssmStringParameterNames: {
-      bucketName: checkEnvVar("WEB_SSM_SP_BUCKET_NAME"),
-      distributionId: checkEnvVar("WEB_SSM_SP_DISTRIBUTION_ID"),
-    },
+    ssmStringParameterNamesWebHosting: {}, // To be filled per environment
+    hostedZoneName: "", // To be filled per environment
   },
 };
 
 export const envConfig: Config = {
+  [Environment.STAG]: {
+    ...sharedConfig,
+    currEnv: Environment.STAG,
+    ssmStringParameterProviderArn:
+      sharedConfig.ssmStringParameterNames.providerArn,
+    oidcSubjectsCdk: {
+      ...sharedConfig.oidcSubjectsCdk,
+      deploy: [
+        `repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:stag-infrastructure`,
+      ],
+    },
+    oidcSubjectsWeb: {
+      deploy: [`repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:stag-web`],
+    },
+    webHosting: {
+      ...sharedConfig.webHosting,
+      ssmStringParameterNamesWebHosting:
+        sharedConfig.ssmStringParameterNames.webHosting,
+      hostedZoneName: "staging.adriantunez.cloud",
+    },
+  },
   [Environment.PROD]: {
     ...sharedConfig,
     currEnv: Environment.PROD,
+    ssmStringParameterProviderArn:
+      sharedConfig.ssmStringParameterNames.providerArn,
     oidcSubjectsCdk: {
       ...sharedConfig.oidcSubjectsCdk,
       deploy: [
@@ -93,18 +127,11 @@ export const envConfig: Config = {
     oidcSubjectsWeb: {
       deploy: [`repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:prod-web`],
     },
-  },
-  [Environment.STAG]: {
-    ...sharedConfig,
-    currEnv: Environment.STAG,
-    oidcSubjectsCdk: {
-      ...sharedConfig.oidcSubjectsCdk,
-      deploy: [
-        `repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:stag-infrastructure`,
-      ],
-    },
-    oidcSubjectsWeb: {
-      deploy: [`repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:stag-web`],
+    webHosting: {
+      ...sharedConfig.webHosting,
+      ssmStringParameterNamesWebHosting:
+        sharedConfig.ssmStringParameterNames.webHosting,
+      hostedZoneName: "adriantunez.cloud",
     },
   },
 };

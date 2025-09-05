@@ -5,9 +5,6 @@ import { OidcCdkRolesStack } from "../lib/oidc/oidcCdkRolesStack";
 import { WebHostingStack } from "../lib/web-hosting/webHostingStack";
 import { OidcWebRolesStack } from "../lib/oidc/oidcWebRolesStack";
 
-console.log(process.env.AWS_ACCOUNT_ID);
-console.log(process.env.JEST_WORKER_ID);
-
 Object.values(Environment).forEach((env) => {
   const app = new App();
   const cfg = envConfig[env];
@@ -22,6 +19,7 @@ Object.values(Environment).forEach((env) => {
           env: cfg.awsConfig,
           currEnv: cfg.currEnv,
           globalTags: globalTags,
+          ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
         }
       );
       expect(stack).toBeDefined();
@@ -38,7 +36,7 @@ Object.values(Environment).forEach((env) => {
           env: cfg.awsConfig,
           currEnv: cfg.currEnv,
           globalTags: globalTags,
-          oidcProviderArn: `arn:aws:iam::${cfg.awsConfig.account}:oidc-provider/token.actions.githubusercontent.com`,
+          ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
           oidcSubjects: cfg.oidcSubjectsCdk,
         }
       );
@@ -77,9 +75,10 @@ Object.values(Environment).forEach((env) => {
           env: cfg.awsConfig,
           currEnv: cfg.currEnv,
           globalTags: globalTags,
-          oidcProviderArn: `arn:aws:iam::${cfg.awsConfig.account}:oidc-provider/token.actions.githubusercontent.com`,
+          ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
           oidcSubjects: cfg.oidcSubjectsWeb,
-          stringParameterNames: testStringParameterNames,
+          ssmStringParameterNamesWebHosting:
+            cfg.webHosting.ssmStringParameterNamesWebHosting,
         }
       );
       expect(stack).toBeDefined();

@@ -6,11 +6,12 @@ import {
   type GlobalTags,
 } from "../../config/environments";
 import { CreateIamRole } from "./constructs/createIamRole";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 interface OidcCdkRolesStackProps extends StackProps {
   currEnv: Environment;
   globalTags: GlobalTags;
-  oidcProviderArn: string;
+  ssmStringParameterProviderArn: string;
   oidcSubjects: OidcSubjects;
 }
 
@@ -18,10 +19,17 @@ export class OidcCdkRolesStack extends Stack {
   constructor(scope: Construct, id: string, props: OidcCdkRolesStackProps) {
     super(scope, id, props);
 
+    // Get Provider ARN from SSM Parameter Store
+    const oidcProviderArn = StringParameter.fromStringParameterName(
+      this,
+      "OidcProviderArn",
+      props.ssmStringParameterProviderArn
+    ).stringValue;
+
     // Create Oidc role for CDK diff, if defined
     if (props.oidcSubjects.diff) {
       CreateIamRole(this, "DiffOidcCdkRole", {
-        oidcProviderArn: props.oidcProviderArn,
+        oidcProviderArn: oidcProviderArn,
         subjectArray: props.oidcSubjects.diff,
         resourcesArray: [
           `arn:aws:iam::${props.env?.account}:role/cdk-*-lookup-role-*`,
@@ -36,7 +44,7 @@ export class OidcCdkRolesStack extends Stack {
     // Create Oidc role for CDK deploy, if defined
     if (props.oidcSubjects.deploy) {
       CreateIamRole(this, "DeployOidcCdkRole", {
-        oidcProviderArn: props.oidcProviderArn,
+        oidcProviderArn: oidcProviderArn,
         subjectArray: props.oidcSubjects.deploy,
         resourcesArray: [`arn:aws:iam::${props.env?.account}:role/cdk-*`],
         roleName: "DeployOidcCdkRole",
