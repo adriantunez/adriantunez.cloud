@@ -1,17 +1,18 @@
 import { config } from "dotenv";
-import { existsSync } from "fs";
 import { resolve } from "path";
-
-// Load env variables from .env if present (easier for development)
-const envPath = resolve(process.cwd(), ".env");
-if (existsSync(envPath)) {
-  config({ path: envPath });
-}
-
 import type { ResourceEnvironment } from "aws-cdk-lib";
+
+// Load env variables if .env files are present (it's easier for development/testing)
+config({
+  path: [
+    resolve(process.cwd(), ".env.dev"),
+    resolve(process.cwd(), ".env.test"),
+  ],
+});
 
 export enum Environment {
   PROD = "prod",
+  STAG = "stag",
 }
 
 export type GlobalTags = {
@@ -46,40 +47,64 @@ export type EnvironmentConfig = {
 
 export type Config = Record<Environment, EnvironmentConfig>;
 
+function checkEnvVar(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing environment variable: ${name}`);
+  }
+  return value;
+}
+
 export const globalTags: GlobalTags = {
-  RepositoryPath:
-    process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY
-      ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
-      : "localhost",
-  Project:
-    process.env.GITHUB_REPOSITORY?.split("/").pop() || "adriantunez.cloud",
+  RepositoryPath: `${checkEnvVar("GITHUB_SERVER_URL")}/${checkEnvVar("GITHUB_REPOSITORY")}`,
+  Project: checkEnvVar("GITHUB_REPOSITORY").split("/").pop()!,
+};
+
+const sharedConfig = {
+  awsConfig: {
+    region: "eu-west-1",
+    account: checkEnvVar("AWS_ACCOUNT_ID"),
+  },
+  oidcSubjectsCdk: {
+    diff: [`repo:${checkEnvVar("GITHUB_REPOSITORY")}:*`],
+  },
+  webHosting: {
+    mainDomainName: checkEnvVar("WEB_MAIN_DOMAIN_NAME"),
+    domainNames: checkEnvVar("WEB_DOMAIN_NAMES").split(","),
+    certificateId: checkEnvVar("AWS_ACM_CERTIFICATE_ID"),
+    hostedZoneName: "adriantunez.cloud",
+    ssmStringParameterNames: {
+      bucketName: checkEnvVar("WEB_SSM_SP_BUCKET_NAME"),
+      distributionId: checkEnvVar("WEB_SSM_SP_DISTRIBUTION_ID"),
+    },
+  },
 };
 
 export const envConfig: Config = {
   [Environment.PROD]: {
+    ...sharedConfig,
     currEnv: Environment.PROD,
-    awsConfig: {
-      region: "eu-west-1",
-      account: process.env.AWS_ACCOUNT_ID || "", // Fail if not defined in code
-    },
     oidcSubjectsCdk: {
-      diff: [`repo:${process.env.GITHUB_REPOSITORY}:*`],
+      ...sharedConfig.oidcSubjectsCdk,
       deploy: [
-        `repo:${process.env.GITHUB_REPOSITORY}:environment:prod-infrastructure`,
+        `repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:prod-infrastructure`,
       ],
     },
     oidcSubjectsWeb: {
-      deploy: [`repo:${process.env.GITHUB_REPOSITORY}:environment:prod-web`],
+      deploy: [`repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:prod-web`],
     },
-    webHosting: {
-      mainDomainName: process.env.WEB_MAIN_DOMAIN_NAME || "", // Fail if not defined in code
-      domainNames: process.env.WEB_DOMAIN_NAMES?.split(",") || [],
-      certificateId: process.env.AWS_ACM_CERTIFICATE_ID || "", // Fail if not defined in code
-      hostedZoneName: "adriantunez.cloud",
-      ssmStringParameterNames: {
-        bucketName: process.env.WEB_SSM_SP_BUCKET_NAME || "", // Fail if not defined in code
-        distributionId: process.env.WEB_SSM_SP_DISTRIBUTION_ID || "", // Fail if not defined in code
-      },
+  },
+  [Environment.STAG]: {
+    ...sharedConfig,
+    currEnv: Environment.STAG,
+    oidcSubjectsCdk: {
+      ...sharedConfig.oidcSubjectsCdk,
+      deploy: [
+        `repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:stag-infrastructure`,
+      ],
+    },
+    oidcSubjectsWeb: {
+      deploy: [`repo:${checkEnvVar("GITHUB_REPOSITORY")}:environment:stag-web`],
     },
   },
 };
