@@ -24,16 +24,12 @@ const customTags = {
 // Export its ARN via a SSM Parameter Store to be read from the rest of envs
 if (currEnv == Environment.PROD) {
   // Create OIDC provider only for prod
-  const oidcProviderStack = new OIDCProviderStack(
-    app,
-    `OIDCProviderStack-${cfg.currEnv}`,
-    {
-      env: cfg.awsConfig,
-      currEnv: cfg.currEnv,
-      globalTags: customTags,
-      ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
-    }
-  );
+  const oidcProviderStack = new OIDCProviderStack(app, `OIDCProviderStack`, {
+    env: cfg.awsConfig,
+    currEnv: cfg.currEnv,
+    globalTags: customTags,
+    ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
+  });
 }
 
 // Create CDK OIDC Roles (diff and deploy) to be used by any app that relies on CDK

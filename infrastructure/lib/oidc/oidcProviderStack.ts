@@ -11,6 +11,8 @@ interface OIDCProviderStackProps extends StackProps {
 }
 
 export class OIDCProviderStack extends Stack {
+  public readonly ghOidcProviderArn: string; // TODO: DELETEME
+
   constructor(scope: Construct, id: string, props: OIDCProviderStackProps) {
     super(scope, id, props);
 
@@ -29,6 +31,8 @@ export class OIDCProviderStack extends Stack {
       parameterName: props.ssmStringParameterProviderArn,
       stringValue: githubOidcProvider.openIdConnectProviderArn,
     });
+
+    this.ghOidcProviderArn = githubOidcProvider.openIdConnectProviderArn; // TODO: DELETEME
 
     // Tag all resources created by the construct (using globalTags)
     Object.entries(props.globalTags).forEach(([key, value]) => {

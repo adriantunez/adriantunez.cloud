@@ -14,6 +14,11 @@
     "cdk:diff:prod": "cdk diff --context environment=prod",
     "cdk:deploy:prod": "cdk deploy --all --require-approval never --context environment=prod",
     "cdk:destroy:prod": "cdk destroy --all --force --context environment=prod",
+    "cdk:bootstrap:stag": "cdk bootstrap --context environment=stag",
+    "cdk:synth:stag": "cdk synth --context environment=stag",
+    "cdk:diff:stag": "cdk diff --context environment=stag",
+    "cdk:deploy:stag": "cdk deploy --all --require-approval never --context environment=stag",
+    "cdk:destroy:stag": "cdk destroy --all --force --context environment=stag",
     "format": "prettier --write ."
   },
   "devDependencies": {

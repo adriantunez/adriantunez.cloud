@@ -87,7 +87,7 @@ const sharedConfig = {
     domainNames: checkEnvVar("WEB_DOMAIN_NAMES").split(","),
     certificateId: checkEnvVar("AWS_ACM_CERTIFICATE_ID"),
     ssmStringParameterNamesWebHosting: {}, // To be filled per environment
-    hostedZoneName: "", // To be filled per environment
+    hostedZoneName: "adriantunez.cloud",
   },
 };
 
@@ -110,7 +110,6 @@ export const envConfig: Config = {
       ...sharedConfig.webHosting,
       ssmStringParameterNamesWebHosting:
         sharedConfig.ssmStringParameterNames.webHosting,
-      hostedZoneName: "staging.adriantunez.cloud",
     },
   },
   [Environment.PROD]: {
@@ -131,7 +130,6 @@ export const envConfig: Config = {
       ...sharedConfig.webHosting,
       ssmStringParameterNamesWebHosting:
         sharedConfig.ssmStringParameterNames.webHosting,
-      hostedZoneName: "adriantunez.cloud",
     },
   },
 };

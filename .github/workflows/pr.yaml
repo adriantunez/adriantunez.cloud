@@ -30,10 +30,14 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          # FIXME: This is just temporary, change it accordingly
-          - cdk_environment: prod
+          - cdk_environment: stag
             web_main_domain_name: staging.adriantunez.cloud
+            diff_role_secret_key: AWS_STAG_DIFF_ROLE_ARN
             web_domain_names: staging.adriantunez.cloud,www-staging.adriantunez.cloud
+          - cdk_environment: prod
+            web_main_domain_name: production.adriantunez.cloud
+            web_domain_names: production.adriantunez.cloud,www-production.adriantunez.cloud
+            diff_role_secret_key: AWS_PROD_DIFF_ROLE_ARN
     with:
       CDK_ENVIRONMENT: ${{ matrix.cdk_environment }}
       WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
@@ -43,7 +47,7 @@ jobs:
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
-      AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DIFF_OIDC_ASSUME_ROLE }}
+      AWS_OIDC_ASSUME_ROLE: ${{ secrets[matrix.diff_role_secret_key] }}
 
   # Matrix to allow testing build in all environments
   hugo:
@@ -53,9 +57,10 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          # FIXME: This is just temporary, change it accordingly
-          - hugo_environment: prod
+          - hugo_environment: stag
             web_main_domain_name: staging.adriantunez.cloud
+          - hugo_environment: prod
+            web_main_domain_name: production.adriantunez.cloud
     with:
       WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
       GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
