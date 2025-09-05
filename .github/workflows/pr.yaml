@@ -2,10 +2,6 @@ name: PR Workflow
 
 on:
   pull_request:
-    paths:
-      - "infrastructure/**"
-      - "web/**"
-      - ".github/workflows/**"
 
 permissions:
   contents: read
@@ -17,14 +13,35 @@ concurrency:
   cancel-in-progress: true # only cancel in-progress runs for PRs
 
 jobs:
+  dispatcher:
+    runs-on: ubuntu-latest
+    outputs:
+      changes: ${{ steps.filter.outputs.changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect relevant path changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            changes:
+              - 'infrastructure/**'
+              - 'web/**'
+              - '.github/workflows/**'
+
   # Just run a single test. It internally checks all envs
   cdk_tests:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     uses: ./.github/workflows/reusable-cdk-tests.yml
     with:
       AUDIT_LEVEL: moderate
 
   # Matrix to allow testing diff in all environments
   cdk_diff:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     uses: ./.github/workflows/reusable-cdk-diff.yml
     strategy:
       fail-fast: true
@@ -49,25 +66,18 @@ jobs:
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
       AWS_OIDC_ASSUME_ROLE: ${{ secrets[matrix.diff_role_secret_key] }}
 
-  # Matrix to allow testing build in all environments
+  # Testing Hugo build
   hugo:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     needs: [cdk_tests, cdk_diff]
     uses: ./.github/workflows/reusable-hugo.yml
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - hugo_environment: stag
-            web_main_domain_name: staging.adriantunez.cloud
-          - hugo_environment: prod
-            web_main_domain_name: production.adriantunez.cloud
     with:
-      WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
+      WEB_MAIN_DOMAIN_NAME: adriantunez.cloud
       GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
 
   all-good:
-    needs: [cdk_tests, cdk_diff, hugo]
-    if: ${{ !cancelled() && needs.cdk_tests.result == 'success' && needs.cdk_diff.result == 'success' && needs.hugo.result == 'success' }}
+    needs: [dispatcher]
+    if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - run: exit 1
