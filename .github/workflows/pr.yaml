@@ -47,8 +47,8 @@ jobs:
             diff_role_secret_key: AWS_STAG_DIFF_ROLE_ARN
             web_domain_names: staging.adriantunez.cloud,www-staging.adriantunez.cloud
           - cdk_environment: prod
-            web_main_domain_name: production.adriantunez.cloud
-            web_domain_names: production.adriantunez.cloud,www-production.adriantunez.cloud
+            web_main_domain_name: adriantunez.cloud
+            web_domain_names: adriantunez.cloud,www.adriantunez.cloud
             diff_role_secret_key: AWS_PROD_DIFF_ROLE_ARN
     with:
       CDK_ENVIRONMENT: ${{ matrix.cdk_environment }}
@@ -75,7 +75,7 @@ jobs:
             web_main_domain_name: staging.adriantunez.cloud
           - hugo_environment: prod
             hugo_configs: config/_default/hugo.toml
-            web_main_domain_name: production.adriantunez.cloud
+            web_main_domain_name: adriantunez.cloud
     with:
       WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
       GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)

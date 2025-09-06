@@ -42,8 +42,8 @@ jobs:
     uses: ./.github/workflows/reusable-cdk-diff.yml
     with:
       CDK_ENVIRONMENT: prod
-      WEB_MAIN_DOMAIN_NAME: production.adriantunez.cloud
-      WEB_DOMAIN_NAMES: production.adriantunez.cloud,www.adriantunez.cloud
+      WEB_MAIN_DOMAIN_NAME: adriantunez.cloud
+      WEB_DOMAIN_NAMES: adriantunez.cloud,www.adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
@@ -58,8 +58,8 @@ jobs:
     with:
       CDK_ENVIRONMENT: prod
       GHA_ENVIRONMENT: prod-infrastructure
-      WEB_MAIN_DOMAIN_NAME: production.adriantunez.cloud
-      WEB_DOMAIN_NAMES: production.adriantunez.cloud,www-production.adriantunez.cloud
+      WEB_MAIN_DOMAIN_NAME: adriantunez.cloud
+      WEB_DOMAIN_NAMES: adriantunez.cloud,www.adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
@@ -75,7 +75,7 @@ jobs:
       GHA_ENVIRONMENT: prod-web
       HUGO_ENVIRONMENT: prod
       HUGO_CONFIGS: config/_default/hugo.toml
-      WEB_MAIN_DOMAIN_NAME: production.adriantunez.cloud
+      WEB_MAIN_DOMAIN_NAME: adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
