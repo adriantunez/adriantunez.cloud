@@ -58,7 +58,7 @@ jobs:
 
       - name: Build Hugo site
         run: hugo -d output/ \
-          -e ${{ inputs.HUGO_ENVIRONMENT }} \
+          --environment ${{ inputs.HUGO_ENVIRONMENT }} \
           --minify -d output/ \
           --baseURL https://${{ inputs.WEB_MAIN_DOMAIN_NAME }}/ \
           --config ${{ inputs.HUGO_CONFIGS }}
