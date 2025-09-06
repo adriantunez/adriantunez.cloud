@@ -1,13 +1,14 @@
-name: Staging Workflow
+name: Production Workflow
 
 on:
   push:
     branches:
       - main
       - feature/add-cdk-infrastructure-stacks # FIXME: Remove
+  # TODO: Add releases here
 
 concurrency:
-  group: staging-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: production-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false # only cancel in-progress runs for PRs
 
 permissions:
@@ -40,27 +41,27 @@ jobs:
     needs: dispatcher
     uses: ./.github/workflows/reusable-cdk-diff.yml
     with:
-      CDK_ENVIRONMENT: stag
-      WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_DOMAIN_NAMES: staging.adriantunez.cloud,www-staging.adriantunez.cloud
-      WEB_SSM_SP_BUCKET_NAME: /web/stag/bucketName
-      WEB_SSM_SP_DISTRIBUTION_ID: /web/stag/distributionId
+      CDK_ENVIRONMENT: prod
+      WEB_MAIN_DOMAIN_NAME: production.adriantunez.cloud
+      WEB_DOMAIN_NAMES: production.adriantunez.cloud,www.adriantunez.cloud
+      WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
+      WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
-      AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_STAG_DIFF_ROLE_ARN }}
+      AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_PROD_DIFF_ROLE_ARN }}
 
   cdk_deploy:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     needs: [cdk_tests, cdk_diff]
     uses: ./.github/workflows/reusable-cdk-deploy.yml
     with:
-      CDK_ENVIRONMENT: stag
-      GHA_ENVIRONMENT: stag-infrastructure
-      WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_DOMAIN_NAMES: staging.adriantunez.cloud,www-staging.adriantunez.cloud
-      WEB_SSM_SP_BUCKET_NAME: /web/stag/bucketName
-      WEB_SSM_SP_DISTRIBUTION_ID: /web/stag/distributionId
+      CDK_ENVIRONMENT: prod
+      GHA_ENVIRONMENT: prod-infrastructure
+      WEB_MAIN_DOMAIN_NAME: production.adriantunez.cloud
+      WEB_DOMAIN_NAMES: production.adriantunez.cloud,www-production.adriantunez.cloud
+      WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
+      WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
@@ -71,9 +72,9 @@ jobs:
     needs: [cdk_diff, cdk_deploy]
     uses: ./.github/workflows/reusable-hugo.yml
     with:
-      GHA_ENVIRONMENT: stag-web
-      WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_SSM_SP_BUCKET_NAME: /web/stag/bucketName
-      WEB_SSM_SP_DISTRIBUTION_ID: /web/stag/distributionId
+      GHA_ENVIRONMENT: prod-web
+      WEB_MAIN_DOMAIN_NAME: production.adriantunez.cloud
+      WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
+      WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId
     secrets:
       AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}
