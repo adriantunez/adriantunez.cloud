@@ -57,7 +57,8 @@ jobs:
           hugo-version: ${{ env.HUGO_VERSION }}
 
       - name: Build Hugo site
-        run: hugo -d output/ \
+        run: |
+          hugo -d output/ \
           --environment ${{ inputs.HUGO_ENVIRONMENT }} \
           --minify -d output/ \
           --baseURL https://${{ inputs.WEB_MAIN_DOMAIN_NAME }}/ \
