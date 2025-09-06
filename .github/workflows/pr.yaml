@@ -14,27 +14,21 @@ concurrency:
 
 jobs:
   dispatcher:
-    runs-on: ubuntu-latest
-    outputs:
-      changes: ${{ steps.filter.outputs.changes }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Detect relevant path changes
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            changes:
-              - 'infrastructure/**'
-              - 'web/**'
-              - '.github/workflows/**'
+    uses: ./.github/workflows/reusable-dispatcher.yml
+    with:
+      # Path filters to detect changes.
+      # ! means exclusion
+      filters: |
+        changes:
+          - 'infrastructure/**'
+          - 'web/**'
+          - '.github/workflows/**'
+          - '!**/*.md'
 
   # Just run a single test. It internally checks all envs
   cdk_tests:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: dispatcher
     uses: ./.github/workflows/reusable-cdk-tests.yml
     with:
       AUDIT_LEVEL: moderate
@@ -42,6 +36,7 @@ jobs:
   # Matrix to allow testing diff in all environments
   cdk_diff:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: dispatcher
     uses: ./.github/workflows/reusable-cdk-diff.yml
     strategy:
       fail-fast: true
@@ -69,17 +64,16 @@ jobs:
   # Testing Hugo build
   hugo:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
-    needs: [cdk_tests, cdk_diff]
+    needs: dispatcher
     uses: ./.github/workflows/reusable-hugo.yml
     with:
       WEB_MAIN_DOMAIN_NAME: adriantunez.cloud
       GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
 
   all-good:
-    needs: [dispatcher]
     if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}
+    needs: dispatcher
     runs-on: ubuntu-latest
     steps:
       - run: exit 1
-        if: >-
-          ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
