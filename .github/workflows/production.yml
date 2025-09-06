@@ -73,6 +73,8 @@ jobs:
     uses: ./.github/workflows/reusable-hugo.yml
     with:
       GHA_ENVIRONMENT: prod-web
+      HUGO_ENVIRONMENT: prod
+      HUGO_CONFIGS: config/_default/hugo.toml
       WEB_MAIN_DOMAIN_NAME: production.adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/prod/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/prod/distributionId

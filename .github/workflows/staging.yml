@@ -72,6 +72,8 @@ jobs:
     uses: ./.github/workflows/reusable-hugo.yml
     with:
       GHA_ENVIRONMENT: stag-web
+      HUGO_ENVIRONMENT: stag
+      HUGO_CONFIGS: config/_default/hugo.toml,config/stag/hugo-override.toml
       WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
       WEB_SSM_SP_BUCKET_NAME: /web/stag/bucketName
       WEB_SSM_SP_DISTRIBUTION_ID: /web/stag/distributionId

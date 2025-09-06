@@ -7,6 +7,14 @@ on:
         description: "Define GitHub Actions environment (empty: no deploy)"
         type: string
         default: ""
+      HUGO_ENVIRONMENT:
+        description: "Define Hugo environment"
+        type: string
+        required: true
+      HUGO_CONFIGS:
+        description: "Define Hugo config files, comma separated"
+        type: string
+        required: true
       WEB_MAIN_DOMAIN_NAME:
         description: "Define Hugo base URL"
         type: string
@@ -49,7 +57,11 @@ jobs:
           hugo-version: ${{ env.HUGO_VERSION }}
 
       - name: Build Hugo site
-        run: hugo --minify -d output/ --baseURL https://${{ inputs.WEB_MAIN_DOMAIN_NAME }}/
+        run: hugo -d output/ \
+          -e ${{ inputs.HUGO_ENVIRONMENT }} \
+          --minify -d output/ \
+          --baseURL https://${{ inputs.WEB_MAIN_DOMAIN_NAME }}/ \
+          --config ${{ inputs.HUGO_CONFIGS }}
 
       - name: Upload Hugo artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # was: actions/upload-artifact@v3

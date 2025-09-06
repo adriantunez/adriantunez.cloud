@@ -24,7 +24,9 @@
   {{ with  .Params.Tags | default .Site.Params.keywords -}}
     <meta name="keywords" content="{{ range . }}{{ . }},{{ end -}}">
   {{- end }}
-  {{ if .Params.robots }}
+  {{ if eq hugo.Environment "stag" }}
+    <meta name="robots" content="noindex, nofollow, noarchive">
+  {{ else if .Params.robots }}
     <meta name="robots" content="{{ .Params.robots }}">
   {{ else if or (eq .Kind "taxonomy") (eq .Kind "term") }}
     <meta name="robots" content="noindex, follow">

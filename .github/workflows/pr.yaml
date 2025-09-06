@@ -66,9 +66,21 @@ jobs:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     needs: dispatcher
     uses: ./.github/workflows/reusable-hugo.yml
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - hugo_environment: stag
+            hugo_configs: config/_default/hugo.toml,config/stag/hugo-override.toml
+            web_main_domain_name: staging.adriantunez.cloud
+          - hugo_environment: prod
+            hugo_configs: config/_default/hugo.toml
+            web_main_domain_name: production.adriantunez.cloud
     with:
-      WEB_MAIN_DOMAIN_NAME: adriantunez.cloud
+      WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
       GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
+      HUGO_ENVIRONMENT: ${{ matrix.hugo_environment }}
+      HUGO_CONFIGS: ${{ matrix.hugo_configs }}
 
   all-good:
     if: ${{ !cancelled() && needs.dispatcher.result == 'success' && needs.cdk_diff.result == 'success' && needs.hugo.result == 'success' }}
