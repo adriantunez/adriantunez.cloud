@@ -83,8 +83,8 @@ jobs:
       HUGO_CONFIGS: ${{ matrix.hugo_configs }}
 
   all-good:
-    if: ${{ !cancelled() && needs.dispatcher.result == 'success' && needs.cdk_diff.result == 'success' && needs.hugo.result == 'success' }}
-    needs: [dispatcher, cdk_diff, hugo]
+    if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}
+    needs: [dispatcher, cdk_tests, cdk_diff, hugo]
     runs-on: ubuntu-latest
     steps:
       - run: exit 1
