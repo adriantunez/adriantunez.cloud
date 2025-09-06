@@ -52,7 +52,7 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    environment: https://${{ inputs.GHA_ENVIRONMENT }}
+    environment: ${{ inputs.GHA_ENVIRONMENT }}
     defaults:
       run:
         working-directory: ${{ vars.INFRA_PATH }}

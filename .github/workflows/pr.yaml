@@ -71,8 +71,8 @@ jobs:
       GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
 
   all-good:
-    if: ${{ !cancelled() && needs.dispatcher.result == 'success' && needs.cdk_deploy.result == 'success' && needs.hugo.result == 'success' }}
-    needs: [dispatcher, cdk_deploy, hugo]
+    if: ${{ !cancelled() && needs.dispatcher.result == 'success' && needs.cdk_diff.result == 'success' && needs.hugo.result == 'success' }}
+    needs: [dispatcher, cdk_diff, hugo]
     runs-on: ubuntu-latest
     steps:
       - run: exit 1
