@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/add-cdk-infrastructure-stacks # FIXME: Remove
 
 concurrency:
   group: staging-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

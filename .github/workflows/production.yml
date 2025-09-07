@@ -1,11 +1,8 @@
 name: Production Workflow
 
 on:
-  push:
-    branches:
-      - main
-      - feature/add-cdk-infrastructure-stacks # FIXME: Remove
-  # TODO: Add releases here
+  release:
+    types: [created]
 
 concurrency:
   group: production-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
