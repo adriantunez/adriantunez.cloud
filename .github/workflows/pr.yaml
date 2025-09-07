@@ -43,19 +43,23 @@ jobs:
       matrix:
         include:
           - cdk_environment: stag
-            web_main_domain_name: staging.adriantunez.cloud
+            web_main_domain_name: STAG_WEB_MAIN_DOMAIN_NAME
             diff_role_secret_key: AWS_STAG_DIFF_ROLE_ARN
-            web_domain_names: staging.adriantunez.cloud,www-staging.adriantunez.cloud
+            web_domain_names: STAG_WEB_DOMAIN_NAMES
+            web_ssm_sp_bucket_name: STAG_WEB_SSM_SP_BUCKET_NAME
+            WEB_SSM_SP_DISTRIBUTION_ID: STAG_WEB_SSM_SP_DISTRIBUTION_ID
           - cdk_environment: prod
-            web_main_domain_name: adriantunez.cloud
-            web_domain_names: adriantunez.cloud,www.adriantunez.cloud
+            web_main_domain_name: PROD_WEB_MAIN_DOMAIN_NAME
+            web_domain_names: PROD_WEB_DOMAIN_NAMES
             diff_role_secret_key: AWS_PROD_DIFF_ROLE_ARN
+            web_ssm_sp_bucket_name: PROD_WEB_SSM_SP_BUCKET_NAME
+            WEB_SSM_SP_DISTRIBUTION_ID: PROD_WEB_SSM_SP_DISTRIBUTION_ID
     with:
       CDK_ENVIRONMENT: ${{ matrix.cdk_environment }}
-      WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
-      WEB_DOMAIN_NAMES: ${{ matrix.web_domain_names }}
-      WEB_SSM_SP_BUCKET_NAME: /web/${{ matrix.cdk_environment }}/bucketName
-      WEB_SSM_SP_DISTRIBUTION_ID: /web/${{ matrix.cdk_environment }}/distributionId
+      WEB_MAIN_DOMAIN_NAME: ${{ vars[matrix.web_main_domain_name] }}
+      WEB_DOMAIN_NAMES: ${{ vars[matrix.web_domain_names] }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ vars[matrix.web_ssm_sp_bucket_name] }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars[matrix.WEB_SSM_SP_DISTRIBUTION_ID] }}
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
@@ -71,16 +75,16 @@ jobs:
       matrix:
         include:
           - hugo_environment: stag
-            hugo_configs: config/_default/hugo.toml,config/stag/hugo-override.toml
-            web_main_domain_name: staging.adriantunez.cloud
+            hugo_configs: STAG_HUGO_CONFIGS
+            web_main_domain_name: STAG_WEB_MAIN_DOMAIN_NAME
           - hugo_environment: prod
-            hugo_configs: config/_default/hugo.toml
-            web_main_domain_name: adriantunez.cloud
+            hugo_configs: PROD_HUGO_CONFIGS
+            web_main_domain_name: PROD_WEB_MAIN_DOMAIN_NAME
     with:
-      WEB_MAIN_DOMAIN_NAME: ${{ matrix.web_main_domain_name }}
+      WEB_MAIN_DOMAIN_NAME: ${{ vars[matrix.web_main_domain_name] }}
       GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
       HUGO_ENVIRONMENT: ${{ matrix.hugo_environment }}
-      HUGO_CONFIGS: ${{ matrix.hugo_configs }}
+      HUGO_CONFIGS: ${{ vars[matrix.hugo_configs] }}
 
   all-good:
     if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}

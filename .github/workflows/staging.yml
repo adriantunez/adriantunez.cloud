@@ -41,10 +41,10 @@ jobs:
     uses: ./.github/workflows/reusable-cdk-diff.yml
     with:
       CDK_ENVIRONMENT: stag
-      WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_DOMAIN_NAMES: staging.adriantunez.cloud,www-staging.adriantunez.cloud
-      WEB_SSM_SP_BUCKET_NAME: /web/stag/bucketName
-      WEB_SSM_SP_DISTRIBUTION_ID: /web/stag/distributionId
+      WEB_MAIN_DOMAIN_NAME: ${{ vars.STAG_WEB_MAIN_DOMAIN_NAME }}
+      WEB_DOMAIN_NAMES: ${{ vars.STAG_WEB_DOMAIN_NAMES }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ vars.STAG_WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars.STAG_WEB_SSM_SP_DISTRIBUTION_ID }}
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
@@ -57,10 +57,10 @@ jobs:
     with:
       CDK_ENVIRONMENT: stag
       GHA_ENVIRONMENT: stag-infrastructure
-      WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_DOMAIN_NAMES: staging.adriantunez.cloud,www-staging.adriantunez.cloud
-      WEB_SSM_SP_BUCKET_NAME: /web/stag/bucketName
-      WEB_SSM_SP_DISTRIBUTION_ID: /web/stag/distributionId
+      WEB_MAIN_DOMAIN_NAME: ${{ vars.STAG_WEB_MAIN_DOMAIN_NAME }}
+      WEB_DOMAIN_NAMES: ${{ vars.STAG_WEB_DOMAIN_NAMES }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ vars.STAG_WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars.STAG_WEB_SSM_SP_DISTRIBUTION_ID }}
     secrets:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
@@ -73,9 +73,9 @@ jobs:
     with:
       GHA_ENVIRONMENT: stag-web
       HUGO_ENVIRONMENT: stag
-      HUGO_CONFIGS: config/_default/hugo.toml,config/stag/hugo-override.toml
-      WEB_MAIN_DOMAIN_NAME: staging.adriantunez.cloud
-      WEB_SSM_SP_BUCKET_NAME: /web/stag/bucketName
-      WEB_SSM_SP_DISTRIBUTION_ID: /web/stag/distributionId
+      HUGO_CONFIGS: ${{ vars.STAG_HUGO_CONFIGS }}
+      WEB_MAIN_DOMAIN_NAME: ${{ vars.STAG_WEB_MAIN_DOMAIN_NAME }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ vars.STAG_WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars.STAG_WEB_SSM_SP_DISTRIBUTION_ID }}
     secrets:
       AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}
