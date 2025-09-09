@@ -34,7 +34,7 @@ jobs:
 
   cdk_deploy:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
-    needs: [cdk_tests, cdk_diff]
+    needs: [cdk_tests]
     uses: ./.github/workflows/reusable-cdk-deploy.yml
     with:
       CDK_ENVIRONMENT: prod
