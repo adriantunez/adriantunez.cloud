@@ -1,5 +1,9 @@
 {
   "acknowledged-issue-numbers": [
     34892
-  ]
+  ],
+  "hosted-zone:account=149722328819:domainName=adriantunez.cloud:region=eu-west-1": {
+    "Id": "/hostedzone/Z05538081W183QQ23S7ZZ",
+    "Name": "adriantunez.cloud."
+  }
 }

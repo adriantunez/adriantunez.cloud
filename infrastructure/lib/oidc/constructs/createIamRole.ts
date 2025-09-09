@@ -1,5 +1,10 @@
 import { Duration } from "aws-cdk-lib";
-import { Role, WebIdentityPrincipal, PolicyDocument, PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
+import {
+  Role,
+  WebIdentityPrincipal,
+  PolicyStatement,
+  Effect,
+} from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 
 export interface CreateIamRoleProps {
@@ -10,14 +15,18 @@ export interface CreateIamRoleProps {
   envName: string;
 }
 
-export function createIamRole(scope: Construct, name: string, props: CreateIamRoleProps): Role {
+export function CreateIamRole(
+  scope: Construct,
+  name: string,
+  props: CreateIamRoleProps
+): Role {
   const role = new Role(scope, name, {
     assumedBy: new WebIdentityPrincipal(props.oidcProviderArn, {
       StringEquals: {
-        'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+        "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
       },
       StringLike: {
-        'token.actions.githubusercontent.com:sub': props.subjectArray,
+        "token.actions.githubusercontent.com:sub": props.subjectArray,
       },
     }),
     roleName: `${props.roleName}-${props.envName}`,
@@ -26,11 +35,13 @@ export function createIamRole(scope: Construct, name: string, props: CreateIamRo
 
   // Add the inline policy ONLY if there are resources to target
   if (props.resourcesArray && props.resourcesArray.length > 0) {
-    role.addToPrincipalPolicy(new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: ['sts:AssumeRole'],
-      resources: props.resourcesArray,
-    }));
+    role.addToPrincipalPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ["sts:AssumeRole"],
+        resources: props.resourcesArray,
+      })
+    );
   }
 
   return role;

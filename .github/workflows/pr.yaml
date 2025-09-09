@@ -1,0 +1,95 @@
+name: PR Workflow
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+  actions: write
+
+concurrency:
+  group: pr-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true # only cancel in-progress runs for PRs
+
+jobs:
+  dispatcher:
+    uses: ./.github/workflows/reusable-dispatcher.yml
+    with:
+      # Path filters to detect changes.
+      # ! means exclusion
+      filters: |
+        changes:
+          - 'infrastructure/**'
+          - 'web/**'
+          - '.github/workflows/**'
+          - '!**/*.md'
+
+  # Just run a single test. It internally checks all envs
+  cdk_tests:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: dispatcher
+    uses: ./.github/workflows/reusable-cdk-tests.yml
+    with:
+      AUDIT_LEVEL: moderate
+
+  # Matrix to allow testing diff in all environments
+  cdk_diff:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: dispatcher
+    uses: ./.github/workflows/reusable-cdk-diff.yml
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - cdk_environment: stag
+            web_main_domain_name: STAG_WEB_MAIN_DOMAIN_NAME
+            diff_role_secret_key: AWS_STAG_DIFF_ROLE_ARN
+            web_domain_names: STAG_WEB_DOMAIN_NAMES
+            web_ssm_sp_bucket_name: STAG_WEB_SSM_SP_BUCKET_NAME
+            WEB_SSM_SP_DISTRIBUTION_ID: STAG_WEB_SSM_SP_DISTRIBUTION_ID
+          - cdk_environment: prod
+            web_main_domain_name: PROD_WEB_MAIN_DOMAIN_NAME
+            web_domain_names: PROD_WEB_DOMAIN_NAMES
+            diff_role_secret_key: AWS_PROD_DIFF_ROLE_ARN
+            web_ssm_sp_bucket_name: PROD_WEB_SSM_SP_BUCKET_NAME
+            WEB_SSM_SP_DISTRIBUTION_ID: PROD_WEB_SSM_SP_DISTRIBUTION_ID
+    with:
+      CDK_ENVIRONMENT: ${{ matrix.cdk_environment }}
+      WEB_MAIN_DOMAIN_NAME: ${{ vars[matrix.web_main_domain_name] }}
+      WEB_DOMAIN_NAMES: ${{ vars[matrix.web_domain_names] }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ vars[matrix.web_ssm_sp_bucket_name] }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars[matrix.WEB_SSM_SP_DISTRIBUTION_ID] }}
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
+      AWS_OIDC_ASSUME_ROLE: ${{ secrets[matrix.diff_role_secret_key] }}
+
+  # Testing Hugo build
+  hugo:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: dispatcher
+    uses: ./.github/workflows/reusable-hugo.yml
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - hugo_environment: stag
+            hugo_configs: STAG_HUGO_CONFIGS
+            web_main_domain_name: STAG_WEB_MAIN_DOMAIN_NAME
+          - hugo_environment: prod
+            hugo_configs: PROD_HUGO_CONFIGS
+            web_main_domain_name: PROD_WEB_MAIN_DOMAIN_NAME
+    with:
+      WEB_MAIN_DOMAIN_NAME: ${{ vars[matrix.web_main_domain_name] }}
+      GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
+      HUGO_ENVIRONMENT: ${{ matrix.hugo_environment }}
+      HUGO_CONFIGS: ${{ vars[matrix.hugo_configs] }}
+
+  all-good:
+    if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}
+    needs: [dispatcher, cdk_tests, cdk_diff, hugo]
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}

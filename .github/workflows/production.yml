@@ -1,0 +1,63 @@
+name: Production Workflow
+
+on:
+  release:
+    types: [created]
+
+concurrency:
+  group: production-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false # only cancel in-progress runs for PRs
+
+permissions:
+  contents: read
+  id-token: write
+  actions: write
+
+jobs:
+  dispatcher:
+    uses: ./.github/workflows/reusable-dispatcher.yml
+    with:
+      filters: |
+        changes:
+          - 'infrastructure/**'
+          - 'web/**'
+          - '.github/workflows/**'
+          - '!**/*.md'
+
+  # Just run a single test. It internally checks all envs
+  cdk_tests:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: dispatcher
+    uses: ./.github/workflows/reusable-cdk-tests.yml
+    with:
+      AUDIT_LEVEL: moderate
+
+  cdk_deploy:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: [cdk_tests]
+    uses: ./.github/workflows/reusable-cdk-deploy.yml
+    with:
+      CDK_ENVIRONMENT: prod
+      GHA_ENVIRONMENT: prod-infrastructure
+      WEB_MAIN_DOMAIN_NAME: ${{ vars.PROD_WEB_MAIN_DOMAIN_NAME }}
+      WEB_DOMAIN_NAMES: ${{ vars.PROD_WEB_DOMAIN_NAMES }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ vars.PROD_WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars.PROD_WEB_SSM_SP_DISTRIBUTION_ID }}
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
+      AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_CDK_DEPLOY_OIDC_ASSUME_ROLE }}
+
+  hugo:
+    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    needs: [cdk_tests, cdk_deploy]
+    uses: ./.github/workflows/reusable-hugo.yml
+    with:
+      GHA_ENVIRONMENT: prod-web
+      HUGO_ENVIRONMENT: prod
+      HUGO_CONFIGS: ${{ vars.PROD_HUGO_CONFIGS }}
+      WEB_MAIN_DOMAIN_NAME: ${{ vars.PROD_WEB_MAIN_DOMAIN_NAME }}
+      WEB_SSM_SP_BUCKET_NAME: ${{ vars.PROD_WEB_SSM_SP_BUCKET_NAME }}
+      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars.PROD_WEB_SSM_SP_DISTRIBUTION_ID }}
+    secrets:
+      AWS_OIDC_ASSUME_ROLE: ${{ secrets.AWS_WEB_DEPLOY_OIDC_ASSUME_ROLE }}
