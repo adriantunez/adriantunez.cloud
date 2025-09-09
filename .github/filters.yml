@@ -1,0 +1,7 @@
+# Path filters to detect changes.
+# ! means exclusion
+changes:
+  - "infrastructure/**"
+  - "web/**"
+  - ".github/workflows/**"
+  - "!**/*.md"
