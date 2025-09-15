@@ -1,8 +1,23 @@
 name: reusable-dispatcher
 
+# TODO: Change this to use a single filter, but with proper ref and base (check defaults if needed)
+
 on:
   workflow_call:
     inputs:
+      github_event_name:
+        description: "GitHub event name"
+        type: string
+        required: true
+      base:
+        description: "Base commit/sha/tag"
+        type: string
+        required: false
+        default: ""
+      ref:
+        description: "Ref commit/sha/tag"
+        type: string
+        required: true
       filters:
         description: "dispatcher paths-filter YAML"
         type: string
@@ -19,32 +34,26 @@ jobs:
   dispatcher:
     runs-on: ubuntu-latest
     outputs:
-      changes: ${{ steps.filter.outputs.changes }}
+      changes: ${{ steps.filter_release_or_push.outputs.changes || steps.filter_pr.outputs.changes }}
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # was: actions/checkout@v4
+        if: ${{ input.github_event_name != 'pull_request' }}
         with:
           fetch-depth: 0
 
-      - name: Get last two tags
+      # If in a release, get the previous tag
+      - name: Get last two tags or commits
+        if: ${{ inputs.github_event_name == 'release' }}
         id: code-snapshot
         run: |
-          if [ -n "${{ github.event.release.tag_name }}" ]; then
-            tags=($(git tag --sort=-creatordate))
-            echo "previous=${tags[1]}" >> $GITHUB_OUTPUT
-            echo "latest=${tags[0]}" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
-            # compare last commit vs commit before push
-            echo "previous=${GITHUB_EVENT_BEFORE}" >> $GITHUB_OUTPUT
-            echo "latest=${GITHUB_SHA}" >> $GITHUB_OUTPUT
-          else
-             # PRs: base is automatically the PR base branch, so leaving it empty
-            echo "previous=" >> $GITHUB_OUTPUT
-            echo "latest=${GITHUB_REF}" >> $GITHUB_OUTPUT
-          fi
+          # release, get tag before the new one
+          tags=($(git tag --sort=-creatordate))
+          echo "previous=${tags[1]}" >> $GITHUB_OUTPUT
 
-      - id: filter
+      - id: filter_release_or_push
+        if: ${{ github.event_name != 'pull_request' }}
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # was: dorny/paths-filter@v3
         with:
           filters: ${{ inputs.filters }}
-          base: ${{ steps.code-snapshot.outputs.previous }}
-          ref: ${{ steps.code-snapshot.outputs.latest }}
+          base: ${{ inputs.base != '' && inputs.base || steps.code-snapshot.outputs.previous }}
+          ref: ${{ inputs.ref }}

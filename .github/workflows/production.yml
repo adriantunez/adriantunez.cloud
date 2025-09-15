@@ -17,6 +17,9 @@ jobs:
   dispatcher:
     uses: ./.github/workflows/reusable-dispatcher.yml
     with:
+      github_event_name: ${{ github.event_name }}
+      # base is calculated in the job: tag before the new one
+      ref: ${{ github.sha }}
       filters: .github/filters.yml
 
   # Just run a single test. It internally checks all envs
