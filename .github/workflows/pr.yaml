@@ -16,14 +16,10 @@ jobs:
   dispatcher:
     uses: ./.github/workflows/reusable-dispatcher.yml
     with:
-      # Path filters to detect changes.
-      # ! means exclusion
-      filters: |
-        changes:
-          - 'infrastructure/**'
-          - 'web/**'
-          - '.github/workflows/**'
-          - '!**/*.md'
+      github_event_name: ${{ github.event_name }}
+      base: ${{ github.event.pull_request.base.sha }}
+      ref: ${{ github.event.pull_request.head.sha }}
+      filters: .github/filters.yml
 
   # Just run a single test. It internally checks all envs
   cdk_tests:
