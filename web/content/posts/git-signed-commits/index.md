@@ -1,7 +1,7 @@
 ---
 title: "Git signed commits"
 summary: "What are signed commits in Git, when they make sense, how they're shown in GitHub as verified, and how they can help in enhancing security in sensitive/public environments by securing development workflows."
-categories: [Code, Coffee Shots, Security]
+categories: [Code, Security]
 tags: [Git, GitHub]
 date: 2025-08-20
 ---
@@ -55,69 +55,74 @@ GPG keys stands for GNU Privacy Guard. Those keys are a widely adopted standard 
 **Creating a GPG key for signing commits**
 
 1. Verify `gnupg` tool is already installed by `gpg --version`, install it otherwise:
-{{< highlight bash >}}
-brew install gnupg # MacOs
-sudo apt update && sudo apt install gnupg # Debian/Ubuntu
-{{< /highlight >}}
+   {{< highlight bash >}}
+   brew install gnupg # MacOs
+   sudo apt update && sudo apt install gnupg # Debian/Ubuntu
+   {{< /highlight >}}
 
 1. Generate a GPG key:
-{{< highlight bash >}}
-gpg --full-generate-key
-# select: (9) ECC (sign and encrypt) *default*
-# select: (1) Curve 25519 *default*
+   {{< highlight bash >}}
+   gpg --full-generate-key
+
+# select: (9) ECC (sign and encrypt) _default_
+
+# select: (1) Curve 25519 _default_
+
 # select: 0 = key does not expire
+
 {{< /highlight >}}
 
 1. Set a name, an email, and a comment:
-{{< highlight text >}}
-Real name: Adri Antunez
-Email address: 1443326+adriantunez@users.noreply.github.com
-Comment: Main GPG
-{{< /highlight >}}
+   {{< highlight text >}}
+   Real name: Adri Antunez
+   Email address: 1443326+adriantunez@users.noreply.github.com
+   Comment: Main GPG
+   {{< /highlight >}}
 
 1. Set a passphrase for extra security (optional).
 
 1. List your keys and copy the key ID:
-{{< highlight bash >}}
-gpg --list-keys
+   {{< highlight bash >}}
+   gpg --list-keys
+
 # key ID: 1B085B03AE15FC601C9244CF4597EA93EB5F9B02
+
 {{< /highlight >}}
 
 1. Get the public key value and copy it:
-{{< highlight bash >}}
-gpg --armor --export 1B085B03AE15FC601C9244CF4597EA93EB5F9B02
-{{< /highlight >}}
-Go into GitHub at `your profile` → `Settings` → `SSH and GPG keys` → `New GPG key`:
-    - Define a `Title`.
-    - Paste the contents into the `Key` field.
+   {{< highlight bash >}}
+   gpg --armor --export 1B085B03AE15FC601C9244CF4597EA93EB5F9B02
+   {{< /highlight >}}
+   Go into GitHub at `your profile` → `Settings` → `SSH and GPG keys` → `New GPG key`: - Define a `Title`. - Paste the contents into the `Key` field.
 
 #### SSH keys
 
 SSH stands for Secure Shell. SSH keys are primarily used for secure authentication and remote access, but GitHub also allows them to be used for signing Git commits.
 
 1. Verify `openssh` tool is already installed by `ssh -V`, install it otherwise:
-{{< highlight bash >}}
-brew install openssh # MacOs
-sudo apt update && sudo apt install openssh-client # Debian/Ubuntu
-{{< /highlight >}}
+   {{< highlight bash >}}
+   brew install openssh # MacOs
+   sudo apt update && sudo apt install openssh-client # Debian/Ubuntu
+   {{< /highlight >}}
 
 1. Generate a SSH key (if you don't have one):
-{{< highlight bash >}}
-ssh-keygen -t ed25519 -C "1443326+adriantunez@users.noreply.github.com" 
+   {{< highlight bash >}}
+   ssh-keygen -t ed25519 -C "1443326+adriantunez@users.noreply.github.com"
+
 # Warning: Ensure you're not overriding existing keys!
+
 {{< /highlight >}}
 
 1. Set a passphrase for extra security (optional).
 
 1. Get the public key value and copy it:
-{{< highlight bash >}}
+   {{< highlight bash >}}
+
 # Assuming default location and default key name...
+
 cat ~/.ssh/id_ed25519.pub
 {{< /highlight >}}
-Go into GitHub at `your profile` → `Settings` → `SSH and GPG keys` → `New SSH key`:
-    - Define a `Title`.
-    - Define the key type as `Signing Key`.
-    - Paste the contents into the `Key` field.
+Go into GitHub at `your profile` → `Settings` → `SSH and GPG keys` → `New SSH key`: - Define a `Title`. - Define the key type as `Signing Key`. - Paste the contents into the `Key` field.
 
 ### Sign commits given a key type
 
@@ -125,32 +130,40 @@ Once you have your GPG or SSH key in place, you can start signing commits. I ten
 
 Example using GPG keys:
 {{< highlight toml >}}
+
 # ~/.gitconfig
+
 [user]
-  # ... other non-related config
-  email = "1443326+adriantunez@users.noreply.github.com" # ensure the email matches your GitHub email account
-  signingkey = 1B085B03AE15FC601C9244CF4597EA93EB5F9B02 # your GPG key id
+
+# ... other non-related config
+
+email = "1443326+adriantunez@users.noreply.github.com" # ensure the email matches your GitHub email account
+signingkey = 1B085B03AE15FC601C9244CF4597EA93EB5F9B02 # your GPG key id
 [gpg]
-    format = openpgp
+format = openpgp
 [commit]
-  gpgsign = true # Automatically sign all commits (no need for: git commit -S ...)
+gpgsign = true # Automatically sign all commits (no need for: git commit -S ...)
 [tag]
-  gpgsign = true # Automatically sign all tags (no need for: git tag -s ...)
+gpgsign = true # Automatically sign all tags (no need for: git tag -s ...)
 {{< /highlight >}}
 
 Example using SSH keys:
 {{< highlight toml >}}
+
 # ~/.gitconfig
+
 [user]
-  # ... other non-related config
-  email = "1443326+adriantunez@users.noreply.github.com" # ensure the email matches your GitHub email account
-  signingkey ~/.ssh/id_ed25519.pub # your SSH key path
+
+# ... other non-related config
+
+email = "1443326+adriantunez@users.noreply.github.com" # ensure the email matches your GitHub email account
+signingkey ~/.ssh/id_ed25519.pub # your SSH key path
 [gpg]
-    format = ssh
+format = ssh
 [commit]
-  gpgsign = true # Automatically sign all commits (no need for: git commit -S ...)
+gpgsign = true # Automatically sign all commits (no need for: git commit -S ...)
 [tag]
-  gpgsign = true # Automatically sign all tags (no need for: git tag -s ...)
+gpgsign = true # Automatically sign all tags (no need for: git tag -s ...)
 {{< /highlight >}}
 
 To get more details on how to configure the `.gitconfig` file, as well as my approach to using different configuration files for different purposes on top of other useful Git settings, check out the [{{<icon "fork">}} Git dynamic authors]({{% relref "/posts/git-dynamic-authors" %}}) blog post.
@@ -165,7 +178,7 @@ I prefer signing with GPG because it's the defacto standard (widely adopted), mo
 
 ## Verified commits on GitHub
 
-We've been discussing already quite a lot about signed commits in Git and GitHub's verified commits. Let's see them in action. 
+We've been discussing already quite a lot about signed commits in Git and GitHub's verified commits. Let's see them in action.
 
 ### The verified badge
 
@@ -178,61 +191,62 @@ GitHub shows next to each commit a badge, this badge can have the following stat
 
 ### Verified badge use cases
 
-In order to see and understand GitHub verified badge in action, I've defined different use cases that will be inspected and explained carefully. In case you're curious, you can check the commit list from the [{{<icon "github">}} Fake Linus Torvalds example ](https://github.com/adriantunez/fake-linus-torvalds-example/commits/main/) repo. 
+In order to see and understand GitHub verified badge in action, I've defined different use cases that will be inspected and explained carefully. In case you're curious, you can check the commit list from the [{{<icon "github">}} Fake Linus Torvalds example ](https://github.com/adriantunez/fake-linus-torvalds-example/commits/main/) repo.
 
 ![GitHub badge use cases](img/github-badge-usecases.png "GitHub badge use cases. On the left, the example repo's commits list. On the right, the output of the `git log --show-signature` command.")
 
 There are several use cases here, let's go through all of them:
 
 1. **Impersonation: wrong signature** <br>
-When using someone else's email, but the commit is signed with a mismatched key, i.e.: not their public key on GitHub. <br>
-Badge: <span style="color:orange;">Unverified</span>
+   When using someone else's email, but the commit is signed with a mismatched key, i.e.: not their public key on GitHub. <br>
+   Badge: <span style="color:orange;">Unverified</span>
 
 1. **Impersonation: unsigned commit** <br>
-When using someone else’s email, but the commit is not signed at all. <br>
-No badge. <br>
-*⚠️ This can be confusing.*
+   When using someone else’s email, but the commit is not signed at all. <br>
+   No badge. <br>
+   _⚠️ This can be confusing._
 
 1. **Own email: correctly signed (name mismatch)** <br>
-Using your own email with a commit signed by the correct key, and the author name mismatches. <br>
-Badge: <span style="color:green;">Verified</span>. <br>
-*Note: GitHub ignored the fake name for verification.*
+   Using your own email with a commit signed by the correct key, and the author name mismatches. <br>
+   Badge: <span style="color:green;">Verified</span>. <br>
+   _Note: GitHub ignored the fake name for verification._
 
 1. **Own email: unsigned commit** <br>
-Using your own email without signing the commit. <br>
-Badge: <span style="color:orange;">Unverified</span> <br>
-*Note: Badge is only shown in <cite>Vigilant Mode[^1]</cite>.*
+   Using your own email without signing the commit. <br>
+   Badge: <span style="color:orange;">Unverified</span> <br>
+   _Note: Badge is only shown in <cite>Vigilant Mode[^1]</cite>._
 
 1. **Own email: wrong signature** <br>
-Using your own email, but with a signature that does not match your registered key.  <br>
-Badge: <span style="color:orange;">Unverified</span>.
+   Using your own email, but with a signature that does not match your registered key. <br>
+   Badge: <span style="color:orange;">Unverified</span>.
 
 1. **Own email: correctly signed (name match)**
-Using your own email with a valid signature from the correct key, and the author name matches.
-Using your own email, signing the commit with the correct key. <br>
-Badge: <span style="color:green;">Verified</span>. <br>
-*Note: At the end, this use case is the same as in 4, eventhough the name is correct here.*
+   Using your own email with a valid signature from the correct key, and the author name matches.
+   Using your own email, signing the commit with the correct key. <br>
+   Badge: <span style="color:green;">Verified</span>. <br>
+   _Note: At the end, this use case is the same as in 4, eventhough the name is correct here._
 
 {{< alert >}}
 There are use cases where someone is impersonated but GitHub doesn't show any badge. This is shown in use case number 2, where no Git commit is signed and we're using someone's else valid email. To solve this, we can enforce commit signing.
 {{< /alert >}}
 
-*Note: The examples shown here uses GPG signing, but from GitHub's perspective the behaviour would be the same if SSH signing were used instead.*
+_Note: The examples shown here uses GPG signing, but from GitHub's perspective the behaviour would be the same if SSH signing were used instead._
 
 ### Enforcing commit signing
 
 GitHub badges can be really informative if we're proactive on checking commit's real authorship. Although, there are two big issues with this approach:
 
 - Manual inspection is neither secure nor realistic.
-- In some cases, no badge is displayed at all (see [verified badge use cases: #2]({{% relref "#verified-badge-use-cases" %}})). 
+- In some cases, no badge is displayed at all (see [verified badge use cases: #2]({{% relref "#verified-badge-use-cases" %}})).
 
 In order to solve these limitations, GitHub provides a mechanism to enforce that every commit needs to be signed and valid. This automates the verification process ensuring only trusted commits are accepted:
 
 To enforce commit signing, we can create a new ruleset by:
+
 1. Go to your `GitHub's repository` → `settings` → `Rules` → `Rulesets` → `New ruleset`.
 1. Choose `New branch ruleset` or `New tag ruleset`, depending on whether you want to protect.
 1. In the ruleset configuration, enable the `Require signed commits` option:
-{{< figure src="img/require-signed-commits.png" alt="Require signed commit setting" caption="Enable the Require signed commits option" >}}
+   {{< figure src="img/require-signed-commits.png" alt="Require signed commit setting" caption="Enable the Require signed commits option" >}}
 1. Configure the rest of the rules as needed. For example, apply them to all branches or only to selected ones.
 
 Once enabled, GitHub will reject any unsigned or invalid commits:

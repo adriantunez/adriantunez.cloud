@@ -1,0 +1,37 @@
+<!-- Newsletter Signup Form -->
+<section
+  class="mt-5 mb-5 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+  <div class="text-center mb-2">
+    <p class="text-sm text-neutral-600 dark:text-neutral-400" id="newsletter-description">
+      Get new posts and updates directly to your inbox!
+    </p>
+  </div>
+
+  <form class="space-y-3" action="https://assets.mailerlite.com/jsonp/1890631/forms/169761461082523558/subscribe"
+    method="POST" id="newsletter-form">
+    <div class="flex gap-6">
+      <input type="text" id="name" name="fields[name]" required placeholder="Your name" autocomplete="name"
+        class="flex-1 shadow appearance-none border rounded px-3 py-2 text-neutral-700 leading-tight focus:outline-none focus:shadow-outline" />
+      <input type="email" id="email" name="fields[email]" required placeholder="your@email.com" autocomplete="email"
+        class="flex-1 shadow appearance-none border rounded px-3 py-2 text-neutral-700 leading-tight focus:outline-none focus:shadow-outline" />
+    </div>
+    <button type="submit"
+      class="!rounded-md bg-primary-600 px-4 py-2 !text-neutral hover:!bg-primary-500 dark:bg-primary-800 dark:hover:!bg-primary-700 w-full font-medium">
+      Subscribe
+    </button>
+    <input type="hidden" name="ml-submit" value="1">
+    <input type="hidden" name="anticsrf" value="true">
+    <input type="hidden" name="fields[environment]" value="{{ hugo.Environment }}">
+    <input type="hidden" name="fields[origin]" value="{{ .context.RelPermalink }}">
+  </form>
+
+  <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-2 text-center" id="newsletter-privacy">
+    No spam, unsubscribe at any time.
+  </p>
+
+  <div id="success-message"
+    class="hidden mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-center">
+    <h4 class="text-base font-semibold text-green-800 dark:text-green-200 mb-1">Almost there!</h4>
+    <p class="text-sm text-green-600 dark:text-green-300">Don't forget to verify the email you've received.</p>
+  </div>
+</section>
