@@ -11,6 +11,6 @@ summary: "An AWS cloud architect, platform engineer, and SRE enthusiast willing 
 >}}
 AWS Cloud Architect
 Platform Engineer
-Site Reliability Engineer
+DevOps Enthusiast
 Dad joke maker
 {{< /typeit >}}

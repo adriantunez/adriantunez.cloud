@@ -53,7 +53,7 @@ jobs:
     uses: ./.github/workflows/reusable-hugo.yml
     with:
       GHA_ENVIRONMENT: stag-web
-      HUGO_ENVIRONMENT: stag
+      HUGO_ENVIRONMENT: staging
       HUGO_CONFIGS: ${{ vars.STAG_HUGO_CONFIGS }}
       WEB_MAIN_DOMAIN_NAME: ${{ vars.STAG_WEB_MAIN_DOMAIN_NAME }}
       WEB_SSM_SP_BUCKET_NAME: ${{ vars.STAG_WEB_SSM_SP_BUCKET_NAME }}

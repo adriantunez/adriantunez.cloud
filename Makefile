@@ -7,7 +7,7 @@ clean:
 
 ## Run Hugo server (clean it first)
 dev: clean
-	hugo serve -s web/ -p 1313 --environment devl
+	hugo serve -s web/ -p 1313 --environment development
 
 ## Show available commands
 help:

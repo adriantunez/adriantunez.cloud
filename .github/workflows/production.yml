@@ -52,7 +52,7 @@ jobs:
     uses: ./.github/workflows/reusable-hugo.yml
     with:
       GHA_ENVIRONMENT: prod-web
-      HUGO_ENVIRONMENT: prod
+      HUGO_ENVIRONMENT: production
       HUGO_CONFIGS: ${{ vars.PROD_HUGO_CONFIGS }}
       WEB_MAIN_DOMAIN_NAME: ${{ vars.PROD_WEB_MAIN_DOMAIN_NAME }}
       WEB_SSM_SP_BUCKET_NAME: ${{ vars.PROD_WEB_SSM_SP_BUCKET_NAME }}
