@@ -37,3 +37,5 @@ I'm always happy to connect and hear your thoughts whether you have a question, 
     </div>
   </form>
 </div>
+
+If you feel more comfortable reaching me out on social media, you can also drop a message on my [{{<icon"linkedin">}} LinkedIn account](https://www.linkedin.com/in/adriantunez/).

@@ -29,7 +29,3 @@ Later, I stepped out of my comfort zone again by jumping into the consultancy wo
 Check out my [{{<icon"mug-hot">}} Coffee Shots]({{% relref "/posts/coffee-shots-intro" %}}) idea. A series of entries where I’ll share valuable lightning posts of tips and tricks. The goal is to keep my writing habit alive, even when I don’t have enough time for usual blogposting, while also capturing handy things worth remembering.
 
 So let's see each other around! If you want to know more about me, you can check the [about me]({{% relref "/about" %}}) section. You can also contact me using the [{{<icon"envelope">}} contact page]({{% relref "/contact" %}}) or drop me a message on my [{{<icon"linkedin">}} LinkedIn account](https://www.linkedin.com/in/adriantunez/).
-
-{{< alert "rss" >}}
-Oh, and don't forget to subscribe to the blog’s [RSS feed](/index.xml) if you want to stay updated on the latest posts!
-{{< /alert >}}

@@ -46,6 +46,18 @@
   weight = 40
 
 [[main]]
+  name = "Background"
+  parent = "About me"
+  pageRef = "about/background"
+  weight = 40
+
+[[main]]
+  name = "Career"
+  parent = "About me"
+  pageRef = "about/career"
+  weight = 45
+
+[[main]]
   name = "Contact"
   pre = "envelope"
   pageRef = "contact"
