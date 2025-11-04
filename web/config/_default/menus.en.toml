@@ -58,10 +58,16 @@
   weight = 45
 
 [[main]]
+  name = "Subscribe"
+  pre = "bell"
+  pageRef = "newsletter"
+  weight = 50
+
+[[main]]
   name = "Contact"
   pre = "envelope"
   pageRef = "contact"
-  weight = 50
+  weight = 60
 
 # -- Footer Menu --
 # The footer menu is displayed at the bottom of the page, just before
@@ -103,7 +109,13 @@
   weight = 40
 
 [[footer]]
+  name = "Subscribe"
+  pre = "bell"
+  pageRef = "newsletter"
+  weight = 50
+
+[[footer]]
   name = "Contact"
   pre = "envelope"
   pageRef = "contact"
-  weight = 50
+  weight = 60

@@ -12,6 +12,6 @@ dev: clean
 ## Show available commands
 help:
 	@echo "Available make commands:"
-	@echo "  make clean   - Remove generated files (web/public, web/resources)"
-	@echo "  make dev     - Clean and start Hugo server on http://localhost:1313"
-	@echo "  make help    - Show this help message"
+	@echo "make clean   - Remove generated files (web/public, web/resources)"
+	@echo "make dev     - Clean and start Hugo server on http://localhost:1313"
+	@echo "make help    - Show this help message"
