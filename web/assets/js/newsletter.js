@@ -7,13 +7,13 @@ document.addEventListener("DOMContentLoaded", function () {
   newsletterForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
+    const name = document.getElementById("newsletter-name").value;
+    const email = document.getElementById("newsletter-email").value;
     const button = e.target.querySelector('button[type="submit"]');
 
     if (!name || !email || !email.includes("@") || !email.includes(".")) return;
 
-    button.textContent = "Subscribing...";
+    button.textContent = "Joining the newsletter...";
     button.disabled = true;
 
     fetch(e.target.action, {
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Email placeholder handler
-  const emailInput = document.getElementById("email");
+  const emailInput = document.getElementById("newsletter-email");
   if (emailInput) {
     emailInput.addEventListener("input", function (e) {
       e.target.placeholder = e.target.value.length > 0 ? "" : "your@email.com";
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Name placeholder handler
-  const nameInput = document.getElementById("name");
+  const nameInput = document.getElementById("newsletter-name");
   if (nameInput) {
     nameInput.addEventListener("input", function (e) {
       e.target.placeholder = e.target.value.length > 0 ? "" : "Your name";

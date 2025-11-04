@@ -27,7 +27,7 @@
     {{ if not $disableImageOptimization }}
     {{ $authorImage = $authorImage.Fill (print "344x556 q" ( $.Site.Params.Author.imagequality | default "96" )) }}
     {{ end }}
-    <img class="mb-2" width="344" height="556" alt="{{ $.Site.Params.Author.name | default " Author" }}"
+    <img class="mb-2" width="344" height="556" alt="{{ $.Site.Params.Author.name | default "Author" }}"
       src="{{ $authorImage.RelPermalink }}" />
     {{ end }}
     {{ end }}
@@ -38,4 +38,4 @@
   {{ partial "recent-articles/main.html" . }}
 </section>
 
-{{ partial "newsletter.html" (dict "context" .) }}
+{{ partial "newsletter.html" . }}
