@@ -8,8 +8,7 @@ showReadingTime: false
 showWordCount: false
 showComments: false
 sharingLinks: false
-_build:
-  list: never
+showNewsletter: false
 ---
 
 I'm always happy to connect and hear your thoughts whether you have a question, a suggestion, an exciting project in mind where I could help you with or anything you'd like to share. I'd love to hear from you! Feel free to reach out by dropping me a message using the form below.

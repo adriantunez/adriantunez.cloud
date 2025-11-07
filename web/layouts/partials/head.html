@@ -177,7 +177,7 @@
   {{ partial "vendor.html" . }}
 
   {{/* Analytics */}}
-  {{ partial "analytics/main.html" .Site }}
+  {{ partial "analytics/main.html" . }}
 
   {{/* Extend head - eg. for custom analytics scripts, etc. */}}
   {{ if templates.Exists "partials/extend-head.html" }}
