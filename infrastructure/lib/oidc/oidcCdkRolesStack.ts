@@ -1,60 +1,44 @@
-import { Stack, StackProps, Tags } from "aws-cdk-lib";
-import { Construct } from "constructs";
-import {
-  OidcSubjects,
-  type Environment,
-  type GlobalTags,
-} from "../../config/environments";
-import { CreateIamRole } from "./constructs/createIamRole";
+import { Stack, StackProps } from "aws-cdk-lib";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { Construct } from "constructs";
+import { CreateIamRole } from "./constructs/createIamRole";
 
 interface OidcCdkRolesStackProps extends StackProps {
-  currEnv: Environment;
-  globalTags: GlobalTags;
-  ssmStringParameterProviderArn: string;
-  oidcSubjects: OidcSubjects;
+  envName: string;
+  ssmProviderArn: string;
+  diffSubjects: string[];
+  deploySubjects: string[];
 }
 
+// Roles GitHub Actions assumes to run cdk diff and cdk deploy.
 export class OidcCdkRolesStack extends Stack {
   constructor(scope: Construct, id: string, props: OidcCdkRolesStackProps) {
     super(scope, id, props);
 
-    // Get Provider ARN from SSM Parameter Store
     const oidcProviderArn = StringParameter.fromStringParameterName(
       this,
       "OidcProviderArn",
-      props.ssmStringParameterProviderArn
+      props.ssmProviderArn,
     ).stringValue;
 
-    // Create Oidc role for CDK diff, if defined
-    if (props.oidcSubjects.diff) {
-      CreateIamRole(this, "DiffOidcCdkRole", {
-        oidcProviderArn: oidcProviderArn,
-        subjectArray: props.oidcSubjects.diff,
-        resourcesArray: [
-          `arn:aws:iam::${props.env?.account}:role/cdk-*-lookup-role-*`,
-          `arn:aws:iam::${props.env?.account}:role/cdk-*-file-publishing-role-*`,
-          `arn:aws:iam::${props.env?.account}:role/cdk-*-image-publishing-role-*`,
-        ],
-        roleName: "DiffOidcCdkRole",
-        envName: props.currEnv,
-      });
-    }
+    CreateIamRole(this, "DiffOidcCdkRole", {
+      oidcProviderArn,
+      subjectArray: props.diffSubjects,
+      resourcesArray: [
+        `arn:aws:iam::${this.account}:role/cdk-*-lookup-role-*`,
+        `arn:aws:iam::${this.account}:role/cdk-*-file-publishing-role-*`,
+        `arn:aws:iam::${this.account}:role/cdk-*-image-publishing-role-*`,
+      ],
+      roleName: "DiffOidcCdkRole",
+      envName: props.envName,
+    });
 
-    // Create Oidc role for CDK deploy, if defined
-    if (props.oidcSubjects.deploy) {
-      CreateIamRole(this, "DeployOidcCdkRole", {
-        oidcProviderArn: oidcProviderArn,
-        subjectArray: props.oidcSubjects.deploy,
-        resourcesArray: [`arn:aws:iam::${props.env?.account}:role/cdk-*`],
-        roleName: "DeployOidcCdkRole",
-        envName: props.currEnv,
-      });
-    }
-
-    // Tag all resources created by the construct (using globalTags)
-    Object.entries(props.globalTags).forEach(([key, value]) => {
-      Tags.of(this).add(key, value);
+    CreateIamRole(this, "DeployOidcCdkRole", {
+      oidcProviderArn,
+      subjectArray: props.deploySubjects,
+      resourcesArray: [`arn:aws:iam::${this.account}:role/cdk-*`],
+      roleName: "DeployOidcCdkRole",
+      envName: props.envName,
     });
   }
 }

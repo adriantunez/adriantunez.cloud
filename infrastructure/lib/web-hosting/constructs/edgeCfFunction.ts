@@ -9,7 +9,24 @@ import path = require("path");
 
 export interface EdgeCfFunctionProps {
   functionRelPath: string;
-  mainDomainName: string;
+  // Each KEY replaces every %%KEY%% placeholder in the function code
+  replacements: Record<string, string>;
+}
+
+export function renderFunctionCode(props: EdgeCfFunctionProps): string {
+  let code = readFileSync(
+    path.join(__dirname, "../../..", props.functionRelPath),
+    "utf8",
+  );
+  for (const [key, value] of Object.entries(props.replacements)) {
+    code = code.split(`%%${key}%%`).join(value);
+  }
+  const missing = code.match(/%%[A-Z_]+%%/);
+  if (missing)
+    throw new Error(
+      `Unreplaced placeholder ${missing[0]} in ${props.functionRelPath}`,
+    );
+  return code;
 }
 
 export class EdgeCfFunction extends Construct {
@@ -18,18 +35,9 @@ export class EdgeCfFunction extends Construct {
   constructor(scope: Construct, id: string, props: EdgeCfFunctionProps) {
     super(scope, id);
 
-    const cfFunctionPlaceholder = readFileSync(
-      path.join(process.cwd(), props.functionRelPath),
-      "utf8"
-    );
-    const cfFunctionCode = cfFunctionPlaceholder.replace(
-      "%%DESIRED_DOMAIN%%",
-      props.mainDomainName
-    );
-
     this.cfFunction = new CloudFrontFunction(this, "WebRedirectFn", {
       runtime: FunctionRuntime.JS_2_0,
-      code: FunctionCode.fromInline(cfFunctionCode),
+      code: FunctionCode.fromInline(renderFunctionCode(props)),
     });
   }
 }

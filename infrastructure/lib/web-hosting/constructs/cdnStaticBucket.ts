@@ -13,13 +13,13 @@ import {
   ViewerProtocolPolicy,
 } from "aws-cdk-lib/aws-cloudfront";
 import { Construct } from "constructs";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Duration } from "aws-cdk-lib";
 import { S3BucketOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 
 export interface cdnStaticBucketProps {
   bucket: Bucket;
-  certificateArn: string;
+  certificate: ICertificate;
   domainNames: string[];
   viewerRequestFn: CloudFrontFunction;
 }
@@ -29,13 +29,6 @@ export class cdnStaticBucket extends Construct {
 
   constructor(scope: Construct, id: string, props: cdnStaticBucketProps) {
     super(scope, id);
-
-    // Certificate is shared between several apps. Get it here
-    const cert = Certificate.fromCertificateArn(
-      this,
-      "ImportedCert",
-      props.certificateArn,
-    );
 
     // Security headers
     const responseHeadersPolicy = new ResponseHeadersPolicy(
@@ -85,7 +78,7 @@ export class cdnStaticBucket extends Construct {
     this.distribution = new Distribution(this, "Distribution", {
       priceClass: PriceClass.PRICE_CLASS_100,
       domainNames: props.domainNames,
-      certificate: cert,
+      certificate: props.certificate,
       httpVersion: HttpVersion.HTTP2_AND_3,
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(props.bucket),
