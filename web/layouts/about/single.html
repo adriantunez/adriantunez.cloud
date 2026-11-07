@@ -1,0 +1,11 @@
+{{ define "main" }}
+<article class="profile-detail">
+  <a class="kicker" href="{{ .Parent.RelPermalink }}">← About me</a>
+  <h1>{{ .Title }}</h1>
+  <div class="article-content prose dark:prose-invert">{{ .Content }}</div>
+  {{ range .Parent.RegularPages }}
+    {{ if ne .RelPermalink $.RelPermalink }}<a class="quiet" href="{{ .RelPermalink }}">{{ .Title }} →</a>{{ end }}
+  {{ end }}
+  {{ partial "newsletter.html" . }}
+</article>
+{{ end }}

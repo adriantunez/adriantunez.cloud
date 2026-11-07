@@ -1,5 +1,6 @@
 ---
 title: "Git signed commits"
+cardDescription: "See what a signed commit proves and how GitHub decides when to mark it as verified."
 summary: "What are signed commits in Git, when they make sense, how they're shown in GitHub as verified, and how they can help in enhancing security in sensitive/public environments by securing development workflows."
 categories: [Code, Security]
 tags: [Git, GitHub]

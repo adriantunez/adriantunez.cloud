@@ -1,41 +1,75 @@
-{{ $disableImageOptimization := .Site.Params.disableImageOptimization | default false }}
-
-<section class="flex flex-flex items-center justify-center text-center gap-6 mt-10">
+<section class="intro">
   <div>
-    <!-- Author details -->
-    <h1 class="text-4xl font-extrabold">
-      {{ .Site.Params.Author.name | default .Site.Title }}
-    </h1>
-
-    <h2 class="text-xl text-neutral-500 dark:text-neutral-400">
-      {{ .Content | markdownify }}
-    </h2>
-    <div class="mt-1 text-2xl flex justify-center items-center">
-      {{ partialCached "author-links.html" . }}
-    </div>
+    <p class="kicker">Platform engineering · AWS · Security</p>
+    <h1>Hi, I’m {{ site.Params.author.name }}.</h1>
+    <div class="typed-roles">{{ .Content }}</div>
+    <p>I build cloud platforms, break things in my home lab, and write down what I learn along the way.</p>
+    <a class="cta" href="#projects">Explore my projects ↓</a>
+    <a class="quiet" href="{{ "about/" | relURL }}">My background ↗</a>
+  </div>
+  {{ with resources.Get site.Params.author.imageMain }}
+    <img src="{{ .RelPermalink }}" alt="Adri Antunez" width="{{ .Width }}" height="{{ .Height }}">
+  {{ end }}
+</section>
+<section class="home-skills" aria-label="Skills">
+  <div>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a4.5 4.5 0 0 1-.4-9A6.5 6.5 0 0 1 18 8.8 5.1 5.1 0 1 1 18 19Z"/></svg>
+    <h2>AWS &amp; Cloud</h2>
+    <p>AWS architecture, infrastructure as code, and lessons from production.</p>
   </div>
   <div>
-    <!-- Author main image -->
-    {{ with .Site.Params.Author.imageMain }}
-    {{ $authorImage := "" }}
-    {{ if or (strings.HasPrefix . "http:") (strings.HasPrefix . "https:") }}
-    {{ $authorImage = resources.GetRemote . }}
-    {{ else }}
-    {{ $authorImage = resources.Get . }}
-    {{ end }}
-    {{ if $authorImage }}
-    {{ if not $disableImageOptimization }}
-    {{ $authorImage = $authorImage.Fill (print "344x556 q" ( $.Site.Params.Author.imagequality | default "96" )) }}
-    {{ end }}
-    <img class="mb-2" width="344" height="556" alt="{{ $.Site.Params.Author.name | default "Author" }}"
-      src="{{ $authorImage.RelPermalink }}" />
-    {{ end }}
-    {{ end }}
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 7 10-5 10 5-10 5ZM2 12l10 5 10-5M2 17l10 5 10-5"/></svg>
+    <h2>Platform &amp; DevSecOps</h2>
+    <p>Secure platforms and delivery workflows that developers can use with confidence.</p>
+  </div>
+  <div>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 2-.5 2.5-2 .9-2.2-1.2-2.1 3.6 2 1.6-.2 2.4-2 1.6 2.1 3.6 2.5-.7 1.9 1.3.5 2.8h4l.6-2.8 1.9-1.3 2.5.7 2.1-3.6-2-1.6-.2-2.4 2-1.6-2.1-3.6-2.2 1.2-2-.9L14 2Z"/><circle cx="12" cy="11.4" r="3"/></svg>
+    <h2>Reliability &amp; Automation</h2>
+    <p>Monitoring systems, investigating failures, and automating repetitive operations.</p>
   </div>
 </section>
-
-<section>
-  {{ partial "recent-articles/main.html" . }}
+<section id="projects">
+  <h2>Selected projects</h2>
+  <div class="project-grid">
+    <a class="panel project" href="https://github.com/adriantunez/adriantunez.cloud">
+      <span class="kicker">AWS CDK / GitHub Actions</span>
+      <h3>The infrastructure behind this site</h3>
+      <p>Follow a change from a pull request to a Hugo build served by CloudFront.</p>
+      <strong>Explore the repository ↗</strong>
+    </a>
+    <a class="panel project" href="{{ relref . "/posts/git-signed-commits" }}">
+      <span class="kicker">Git / Security</span>
+      <h3>The Git signing experiment</h3>
+      <p>I tried impersonating a commit author to see exactly what GitHub verifies.</p>
+      <strong>Read the experiment →</strong>
+    </a>
+  </div>
 </section>
-
-{{ partial "newsletter.html" . }}
+{{ if site.Params.homepage.showRecent }}
+  {{ with site.GetPage "/posts" }}
+    {{ $archive := .RelPermalink }}
+    {{ with first site.Params.homepage.showRecentItems .RegularPages.ByDate.Reverse }}
+      <section class="home-writing" aria-labelledby="recent-posts">
+        <h2 id="recent-posts">Recent posts</h2>
+        <div class="recent-grid">
+          {{ range . }}
+            <a class="panel project" href="{{ .RelPermalink }}">
+              {{ with .Resources.GetMatch "featured*" }}
+                {{ $thumb := .Fill "640x360 webp q82" }}
+                <img class="recent-thumbnail" src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async" alt="">
+              {{ end }}
+              <time class="kicker" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_medium" }}</time>
+              <h3>{{ .Title }}</h3>
+              <p class="recent-description">{{ .Params.cardDescription | default (.Summary | plainify | truncate 110) }}</p>
+            </a>
+          {{ end }}
+        </div>
+        <a class="quiet" href="{{ $archive }}">All writing →</a>
+      </section>
+    {{ end }}
+  {{ end }}
+{{ end }}
+<section class="home-contact">
+  <h2>Working on something similar?</h2>
+  <a class="quiet" href="{{ relref . "/contact" }}">Get in touch ↗</a>
+</section>

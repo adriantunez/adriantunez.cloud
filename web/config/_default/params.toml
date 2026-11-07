@@ -8,8 +8,7 @@
 colorScheme = "blowfish"
 defaultAppearance = "dark" # valid options: light or dark
 autoSwitchAppearance = true
-logo = "img/aalogo-secondary.png"
-secondaryLogo = "img/aalogo.png"
+logo = "img/aa-mark.svg"
 
 enableSearch = true
 enableCodeCopy = true
@@ -36,7 +35,7 @@ giteaDefaultServer = "https://git.fsfe.org"
 forgejoDefaultServer = "https://v8.next.forgejo.org"
 
 [header]
-  layout = "basic" # valid options: basic, fixed, fixed-fill, fixed-gradient, fixed-fill-blur
+  layout = "personal" # valid options: basic, fixed, fixed-fill, fixed-gradient, fixed-fill-blur
 
 [footer]
   showMenu = true
@@ -48,7 +47,7 @@ forgejoDefaultServer = "https://v8.next.forgejo.org"
 [homepage]
   layout = "custom" # valid options: page, profile, custom
   showRecent = true
-  showRecentItems = 5
+  showRecentItems = 3
   showMoreLink = true
   showMoreLinkDest = '/posts/'
   cardView = false
@@ -150,7 +149,7 @@ forgejoDefaultServer = "https://v8.next.forgejo.org"
 
 [buymeacoffee]
   identifier = "adriantunez"
-  globalWidget = true
+  globalWidget = false
   globalWidgetMessage = ""
   globalWidgetColor = "#FF9900"
   globalWidgetPosition = "Right"

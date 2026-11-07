@@ -1,22 +1,15 @@
-<!-- Newsletter Signup Form -->
-{{/* Render newsletter when frontmatter `showNewsletter` is true or absent (default true). */}}
-{{ if (default true .Params.showNewsletter) }}
-<section
-  class="mt-5 mb-5 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
-  <div class="text-center mb-2">
-    <p class="text-sm text-neutral-600 dark:text-neutral-400" id="newsletter-description">
-      Join other engineers and never miss a post. Straight to your inbox!
-    </p>
-  </div>
-
+{{ if ne .Params.showNewsletter false }}
+<section class="newsletter-card" aria-label="Newsletter signup">
+  {{ if ne .Section "newsletter" }}<h2>Newsletter</h2>{{ end }}
+  <p id="newsletter-description">Get my notes on AWS, platform engineering, and what I learn running systems in production.</p>
   <form class="space-y-3" action="https://assets.mailerlite.com/jsonp/1890631/forms/169761461082523558/subscribe"
     method="POST" id="newsletter-form">
     <div class="flex flex-col sm:flex-row">
-      <input type="text" id="newsletter-name" name="fields[name]" required placeholder="Your name" autocomplete="name"
-        class="flex-1 mb-2 sm:mb-0 sm:mr-3 shadow appearance-none border rounded px-3 py-2 text-neutral-700 leading-tight focus:outline-none focus:shadow-outline h-10" />
-      <input type="email" id="newsletter-email" name="fields[email]" required placeholder="your@email.com"
+      <input type="text" id="newsletter-name" aria-label="Your name" name="fields[name]" required placeholder="Your name" autocomplete="name"
+        class="flex-1 mb-2 sm:mb-0 sm:mr-3 shadow appearance-none border border-neutral-300 dark:border-neutral-600 rounded px-3 py-2 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-500 h-10" />
+      <input type="email" id="newsletter-email" aria-label="Your email" name="fields[email]" required placeholder="your@email.com"
         autocomplete="email"
-        class="flex-1 sm:ml-3 shadow appearance-none border rounded px-3 py-2 text-neutral-700 leading-tight focus:outline-none focus:shadow-outline h-10" />
+        class="flex-1 sm:ml-3 shadow appearance-none border border-neutral-300 dark:border-neutral-600 rounded px-3 py-2 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-500 h-10" />
     </div>
     <button type="submit"
       class="!rounded-md bg-primary-600 px-4 py-2 !text-neutral hover:!bg-primary-500 dark:bg-primary-800 dark:hover:!bg-primary-700 w-full font-medium">
@@ -32,10 +25,6 @@
     No spam, unsubscribe at any time.
   </p>
 
-  <div id="success-message"
-    class="hidden mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-center">
-    <h4 class="text-base font-semibold text-green-800 dark:text-green-200 mb-1">Almost there!</h4>
-    <p class="text-sm text-green-600 dark:text-green-300">A confirmation email will arrive in a few minutes. If you don’t see it, check your spam folder.</p>
-  </div>
+  <p id="newsletter-status" role="status" aria-live="polite"></p>
 </section>
 {{ end }}

@@ -36,7 +36,7 @@ permissions:
   contents: read
 
 env:
-  HUGO_VERSION: "0.152.2"
+  HUGO_VERSION: "0.169.0"
 
 jobs:
   build:
@@ -54,6 +54,7 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # was: peaceiris/actions-hugo@v3
         with:
+          extended: true
           hugo-version: ${{ env.HUGO_VERSION }}
 
       - name: Build Hugo site

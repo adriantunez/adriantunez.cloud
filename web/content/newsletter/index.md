@@ -8,6 +8,5 @@ showReadingTime: false
 showWordCount: false
 showComments: false
 sharingLinks: false
+showNewsletter: true
 ---
-
-Subscribe to get real-world DevOps, platform engineering, and AWS cloud insights straight to your inbox. No spam, just valuable lessons and technical content from building and running systems in production.

@@ -1,5 +1,6 @@
 ---
 title: Git dynamic authors
+cardDescription: "Let Git pick your work or personal email based on the folder you’re working in."
 summary: "A dynamic Git configuration that automatically sets the author name and email based on the repository path. It's perfect for working on multiple projects from a single laptop safely without manual switching."
 categories: [Code, Security]
 tags: [Git]

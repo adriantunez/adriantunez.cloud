@@ -1,1 +1,4 @@
 disableKinds = ["sitemap", "robotsTXT"]
+
+[params]
+  robots = "noindex, nofollow, noarchive"

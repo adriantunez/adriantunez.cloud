@@ -1,7 +1,7 @@
-languageCode = "en"
-languageName = "English"
+locale = "en"
+label = "English"
 weight = 1
-title = "Adriantunez.cloud"
+title = "adriantunez.cloud"
 
 [params]
   displayName = "English"
@@ -10,7 +10,7 @@ title = "Adriantunez.cloud"
   dateFormat = "2 January 2006"
   # logo = "img/logo.png"
   # secondaryLogo = "img/secondary-logo.png"
-  description = "Adri Antunez personal blog"
+  description = "Projects and engineering notes from Adri Antunez on AWS infrastructure, platform engineering and Git."
   copyright = "Copyright by adriantunez.cloud"
 
 [params.author]
@@ -19,8 +19,8 @@ title = "Adriantunez.cloud"
   image = "img/me.jpeg"
   imageMain = "img/adri-antunez-main-nb.png"
   imageQuality = 80
-  headline = "AWS Cloud Architect · Platform Engineer · Site Reliability Engineer · Dad joke maker"
-  bio = "AWS Cloud Architect · Platform Engineer · Site Reliability Engineer · Dad joke maker"
+  headline = "Platform Engineer · AWS · Security · Dad joke maker"
+  bio = "I design, build and operate cloud platforms with AWS, Kubernetes and Terraform, with a focus on security and crypto infrastructure."
   links = [
     { github = "https://github.com/adriantunez" },
     { linkedin = "https://www.linkedin.com/in/adriantunez" },

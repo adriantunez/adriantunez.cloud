@@ -1,7 +1,7 @@
 ---
 title: "Career"
 date: 2025-04-07
-summary: "Learn about my career journey from education to hands-on experience, where tech and soft skills blend."
+summary: "The teams I’ve worked with, my technical experience, certifications, and education."
 draft: false
 showDate: false
 showReadingTime: false
@@ -29,9 +29,9 @@ It's cool to share my resume so that you can learn more about my background and 
 | Company                           | Job Title                                      | Period                                    | Keywords                                                                                                                                           |
 | --------------------------------- | ---------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Clovr Labs                        | Platform Engineer                              | {{<keyword>}}2025 - present{{</keyword>}} | {{<details>}}Kubernetes, Helm, ArgoCD, GitHub, AWS, Terraform, Ansible, Grafana/Datadog, Go, Blockchain, Lightning network, Security{{</details>}} |
-| Polar Squad<br/> _Client: Finnish Telecommunications Company_                       | DevOps Consultant                              | {{<keyword>}}2024 - 2025{{</keyword>}}    | {{<details>}}Kubernetes, Helm, ArgoCD, GitHub, AWS/Onprem, AWS CDK, Grafana, NodeJS, Python{{</details>}}                                |
-| Polar Squad<br/> _Client: German Digital Language Learning Company_                       | Platform Engineer Consultant                              | {{<keyword>}}2023 - 2024{{</keyword>}}    | {{<details>}}GitHub, AWS, Terraform, Okta, PagerDuty, Security{{</details>}}                                |
-| Polar Squad                       | DevOps Consultant                              | {{<keyword>}}2023 - 2025{{</keyword>}}    | {{<details>}}Kubernetes, Helm, ArgoCD, GitHub, AWS/Onprem, AWS CDK/Terraform, Grafana, NodeJS, Python{{</details>}}                                |
+| Polar Squad<br/> _Internal role_ | DevOps Consultant                              | {{<keyword>}}2023 - 2025{{</keyword>}}    | {{<details>}}Kubernetes, Helm, ArgoCD, GitHub, AWS/Onprem, AWS CDK/Terraform, Grafana, NodeJS, Python{{</details>}}                                |
+| Polar Squad<br/> _Client project: Finnish telecommunications company_                       | DevOps Consultant                              | {{<keyword>}}2024 - 2025{{</keyword>}}    | {{<details>}}Kubernetes, Helm, ArgoCD, GitHub, AWS/Onprem, AWS CDK, Grafana, NodeJS, Python{{</details>}}                                |
+| Polar Squad<br/> _Client project: German digital language-learning company_                       | Platform Engineer Consultant                              | {{<keyword>}}2023 - 2024{{</keyword>}}    | {{<details>}}GitHub, AWS, Terraform, Okta, PagerDuty, Security{{</details>}}                                |
 | Freelance Consultant              | DevOps & SRE Consultant                        | {{<keyword>}}2020 - 2022{{</keyword>}}    | {{<details>}}AWS, Github/Gitlab, Kubernetes, Terraform, NodeJs/PHP/Python{{</details>}}                                                            |
 | Inbenta                           | DevOps & Security Engineer                     | {{<keyword>}}2017 - 2022{{</keyword>}}    | {{<details>}}AWS, Gitlab, Terraform, Memcached/Redis, NodeJS, PHP, Python{{</details>}}                                                            |
 | Expert Ymaging                    | Systems Engineer<br>Software Developer         | {{<keyword>}}2015 - 2017{{</keyword>}}    | {{<details>}}Onprem, Proxmox, Fortinet, Cisco, Github, C/C++, Python{{</details>}}                                                                 |

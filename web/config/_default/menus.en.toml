@@ -1,73 +1,36 @@
-# -- Main Menu --
-# The main menu is displayed in the header at the top of the page.
-# Acceptable parameters are name, pageRef, page, url, title, weight.
-# 
-# The simplest menu configuration is to provide:
-#   name = The name to be displayed for this menu link
-#   pageRef = The identifier of the page or section to link to
-#
-# By default the menu is ordered alphabetically. This can be
-# overridden by providing a weight value. The menu will then be
-# ordered by weight from lowest to highest.
-
 [[main]]
-  name = "Home"
-  pageRef = "/"
+  name = "Writing"
+  pageRef = "posts"
   weight = 10
 
 [[main]]
-  name = "Blog"
-  pre = "edit"
-  pageRef = "posts"
+  name = "Projects"
+  url = "/#projects"
   weight = 20
 
 [[main]]
-  name = "Categories"
-  parent = "Blog"
-  pageRef = "categories"
-  weight = 20
-
-[[main]]
-  name = "Tags"
-  parent = "Blog"
-  pageRef = "tags"
-  weight = 20
-
-[[main]]
-  name = "Coffee Shots"
-  pre = "mug-hot"
-  pageRef = "categories/coffee-shots"
+  name = "About"
+  pageRef = "about"
   weight = 30
 
 [[main]]
-  name = "About me"
-  pre = "heart-empty"
-  pageRef = "about"
+  name = "Coffee Shots"
+  pageRef = "categories/coffee-shots"
   weight = 40
 
 [[main]]
-  name = "Background"
-  parent = "About me"
-  pageRef = "about/background"
-  weight = 40
+  identifier = "github"
+  pre = "github"
+  title = "GitHub"
+  url = "https://github.com/adriantunez"
+  weight = 41
 
 [[main]]
-  name = "Career"
-  parent = "About me"
-  pageRef = "about/career"
-  weight = 45
-
-[[main]]
-  name = "Subscribe"
-  pre = "bell"
-  pageRef = "newsletter"
-  weight = 50
-
-[[main]]
-  name = "Contact"
-  pre = "envelope"
-  pageRef = "contact"
-  weight = 60
+  identifier = "linkedin"
+  pre = "linkedin"
+  title = "LinkedIn"
+  url = "https://www.linkedin.com/in/adriantunez/"
+  weight = 42
 
 # -- Footer Menu --
 # The footer menu is displayed at the bottom of the page, just before

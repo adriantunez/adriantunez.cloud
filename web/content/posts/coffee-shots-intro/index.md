@@ -1,5 +1,6 @@
 ---
 title: Coffee Shots introduction
+cardDescription: "Why I started Coffee Shots, a series of quick technical tips you can read over coffee."
 summary: "Introduction to why I created the Coffee Shots category. These quick and insightful blog posts will deliver valuable tips and tricks, while capturing important details for future reference." 
 categories: [News, Coffee Shots]
 tags: [Blog]
