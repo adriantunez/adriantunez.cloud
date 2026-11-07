@@ -2,7 +2,7 @@
 title: "Adri Antunez's Cloud Site"
 date: 2025-03-28T20:55:37+01:00
 draft: false
-summary: "I design, build and operate cloud platforms with AWS, Kubernetes and Terraform, with a focus on security and crypto infrastructure."
+summary: "I design, build and operate secure cloud and crypto platforms with AWS, Kubernetes and Terraform."
 ---
 {{< typeit 
   speed=65
@@ -11,6 +11,6 @@ summary: "I design, build and operate cloud platforms with AWS, Kubernetes and T
 >}}
 Platform Engineer
 AWS Cloud Architect
-Security & crypto infra
+Cloud & crypto platforms
 Dad joke maker
 {{< /typeit >}}
