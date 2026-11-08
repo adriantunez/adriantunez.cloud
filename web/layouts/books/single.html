@@ -9,6 +9,7 @@
     {{ with where $books "status" .status }}
       <section class="book-group">
         <h2>{{ $label }}</h2>
+        <div class="book-grid">
         {{ range . }}
           <article class="panel book">
             <h3>{{ if .url }}<a href="{{ .url }}">{{ .title }} ↗</a>{{ else }}{{ .title }}{{ end }}</h3>
@@ -16,6 +17,7 @@
             <p>{{ .note }}</p>
           </article>
         {{ end }}
+        </div>
       </section>
     {{ end }}
   {{ end }}
