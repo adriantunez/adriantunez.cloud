@@ -1,7 +1,7 @@
 ---
 title: "Books"
 date: 2026-11-08
-summary: "Books I'm reading, have read, or plan to read, from time and attention to the Lightning Network."
+summary: "What I'm reading, what I've read, and what's next on my list."
 draft: false
 showDate: false
 showReadingTime: false
