@@ -229,3 +229,8 @@ body.flex {
 .book h3 { font-size: 1.1rem; font-weight: 700; margin: 0; }
 .book p { margin: .25rem 0 0; }
 .book p:not(.kicker) { color: var(--muted); }
+
+/* About page: Background, Career and Books side by side on wide screens */
+@media(min-width: 801px) {
+  .about-cards { grid-template-columns: repeat(3, 1fr); }
+}

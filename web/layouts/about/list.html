@@ -4,8 +4,8 @@
   <h1>{{ .Title }}</h1>
   {{ .Content }}
 </section>
-<div class="project-grid">
-  {{ range slice "/about/background" "/about/career" }}
+<div class="project-grid about-cards">
+  {{ range slice "/about/background" "/about/career" "/books" }}
     {{ with site.GetPage . }}
       <a class="panel project" href="{{ .RelPermalink }}"><h2>{{ .Title }} →</h2><p>{{ .Description | default .Summary | plainify }}</p></a>
     {{ end }}
