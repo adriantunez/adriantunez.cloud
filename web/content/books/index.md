@@ -36,6 +36,21 @@ books:
     year: 2022
     status: read
     note: "Why our ability to pay attention keeps getting worse, and what we can do about it, both personally and as a society."
+  - title: "How to Make Good Things Happen"
+    author: "Marian Rojas Estapé"
+    year: 2018
+    status: read
+    note: "A psychiatrist explains how cortisol, attention and habits shape how we feel, and how to steer them toward a calmer, happier life."
+  - title: "The Power of Now"
+    author: "Eckhart Tolle"
+    year: 1997
+    status: read
+    note: "A guide to living in the present moment instead of being run by thoughts about the past and the future."
+  - title: "Tuesdays with Morrie"
+    author: "Mitch Albom"
+    year: 1997
+    status: read
+    note: "A journalist's weekly visits to his dying former professor, and their conversations about love, work and what matters in life."
 ---
 
 Books I'm reading or have read, with a line on what each one is about.
