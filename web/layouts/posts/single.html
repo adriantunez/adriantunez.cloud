@@ -31,7 +31,7 @@
       {{ range site.Taxonomies.categories.ByCount }}<a class="chip" href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }} ({{ .Count }})</a>{{ end }}
     </section>
   {{ partial "newsletter.html" . }}
-    <a class="quiet" href="https://www.buymeacoffee.com/adriantunez">Support my writing ↗</a>
+    {{ partial "support.html" (dict "page" . "heading" true) }}
   </aside>
 </div>
 {{ end }}

@@ -73,6 +73,12 @@
   weight = 45
 
 [[footer]]
+  name = "Support"
+  pre = "bolt"
+  pageRef = "support"
+  weight = 47
+
+[[footer]]
   name = "Subscribe"
   pre = "bell"
   pageRef = "newsletter"

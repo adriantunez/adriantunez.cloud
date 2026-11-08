@@ -1,0 +1,39 @@
+{{/* Support widget: Lightning (LNURL-pay via a Lightning Address) and Buy Me a Coffee tabs.
+     Call with (dict "page" . "heading" true). An empty support.lightningAddress runs it in demo mode. */}}
+{{ $address := site.Params.support.lightningAddress | default "" }}
+{{ $amount := site.Params.support.defaultAmount | default 5000 }}
+{{ $coffee := site.Params.buymeacoffee.identifier }}
+<section class="panel support" data-support data-address="{{ $address }}" aria-labelledby="support-title">
+  {{ if .heading }}<h2 id="support-title">Support my writing</h2>{{ else }}<span id="support-title" hidden>Support my writing</span>{{ end }}
+  {{ if .heading }}<p>If something here saved you time, send a few sats or buy me a coffee.</p>{{ end }}
+
+  <div class="support-tabs" role="tablist" aria-label="Payment method">
+    <button type="button" role="tab" id="support-tab-ln" aria-controls="support-ln" aria-selected="true">{{ partial "icon.html" "bolt" }}Lightning</button>
+    <button type="button" role="tab" id="support-tab-coffee" aria-controls="support-coffee" aria-selected="false" tabindex="-1">{{ partial "icon.html" "mug-hot" }}Coffee</button>
+  </div>
+
+  <div class="support-pane" role="tabpanel" id="support-ln" aria-labelledby="support-tab-ln">
+    <form class="support-custom">
+      <label><input type="number" min="1" step="1" inputmode="numeric" value="{{ $amount }}" aria-label="Amount in sats" required><span>sats</span></label>
+      <button type="submit">Get invoice</button>
+    </form>
+    <div class="support-invoice" hidden>
+      <div class="support-qr" role="img" aria-label="QR code of the Lightning invoice"></div>
+      <div class="support-actions">
+        <button type="button" class="support-webln" hidden>Pay with browser wallet</button>
+        <a class="support-open" href="#">Open in wallet</a>
+        <button type="button" class="support-copy" data-copy="">Copy invoice</button>
+      </div>
+    </div>
+    <p class="support-status" role="status" aria-live="polite"></p>
+    {{ if not $address }}<p class="support-address">Demo mode: no Lightning Address configured, invoices are fake.</p>{{ end }}
+  </div>
+
+  <div class="support-pane" role="tabpanel" id="support-coffee" aria-labelledby="support-tab-coffee" hidden>
+    <p>Prefer a card? Buy Me a Coffee takes cards, Apple Pay and Google Pay.</p>
+    <a class="support-coffee-link" href="https://www.buymeacoffee.com/{{ $coffee }}">Buy me a coffee ↗</a>
+  </div>
+</section>
+{{ $alg := site.Params.fingerprintAlgorithm | default "sha512" }}
+{{ $js := slice (resources.Get "js/vendor/qrcode-generator-1.4.4.js") (resources.Get "js/support.js") | resources.Concat "js/support.bundle.js" | resources.Minify | resources.Fingerprint $alg }}
+<script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>

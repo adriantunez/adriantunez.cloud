@@ -147,6 +147,11 @@ forgejoDefaultServer = "https://v8.next.forgejo.org"
   # token = "XXXXXX"
   # enableTrackEvent = true
 
+[support]
+  # Lightning Address used for LNURL-pay invoices, e.g. "name@coinos.io". Empty runs the widget in demo mode.
+  lightningAddress = "nastywork557@walletofsatoshi.com"
+  defaultAmount = 5000 # sats, the reader can change it
+
 [buymeacoffee]
   identifier = "adriantunez"
   globalWidget = false
