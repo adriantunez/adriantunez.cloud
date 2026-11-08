@@ -4,7 +4,7 @@
   {{ .Content }}
   {{ $page := . }}
   {{ $books := .Params.books }}
-  {{ $groups := slice (dict "status" "reading" "label" "Currently reading") (dict "status" "read" "label" "Read") }}
+  {{ $groups := slice (dict "status" "reading" "label" "Currently reading") (dict "status" "read" "label" "Read") (dict "status" "pending" "label" "Up next") }}
   {{ range $groups }}
     {{ $label := .label }}
     {{ with where $books "status" .status }}

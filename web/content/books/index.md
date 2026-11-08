@@ -1,7 +1,7 @@
 ---
 title: "Books"
 date: 2026-11-08
-summary: "Books I'm reading or have read, from time and attention to the Lightning Network."
+summary: "Books I'm reading, have read, or plan to read, from time and attention to the Lightning Network."
 draft: false
 showDate: false
 showReadingTime: false
@@ -10,7 +10,7 @@ showComments: false
 sharingLinks: false
 build:
   publishResources: false # only publish the resized covers
-# status: reading | read. cover: image path inside this folder (optional)
+# status: reading | read | pending. cover: image path inside this folder (optional)
 books:
   - title: "Four Thousand Weeks"
     cover: "covers/four-thousand-weeks.jpg"
@@ -61,6 +61,36 @@ books:
     year: 1997
     status: read
     note: "A journalist's weekly visits to his dying former professor, and their conversations about love, work and what matters in life."
+  - title: "Encuentra tu persona vitamina"
+    cover: "covers/encuentra-tu-persona-vitamina.jpg"
+    author: "Marian Rojas Estapé"
+    year: 2021
+    status: read
+    note: "How the people around us affect our body and mind, and how to build relationships that do us good. Spanish only, no English edition yet."
+  - title: "Rich Dad Poor Dad"
+    cover: "covers/rich-dad-poor-dad.jpg"
+    author: "Robert T. Kiyosaki"
+    year: 1997
+    status: read
+    note: "Two contrasting views on money, and why financial literacy and assets matter more than a high salary."
+  - title: "The Monk Who Sold His Ferrari"
+    cover: "covers/the-monk-who-sold-his-ferrari.jpg"
+    author: "Robin Sharma"
+    year: 1997
+    status: read
+    note: "A fable about a burned-out lawyer who gives up his career and learns simple practices for a more balanced, purposeful life."
+  - title: "Die with Zero"
+    cover: "covers/die-with-zero.jpg"
+    author: "Bill Perkins"
+    year: 2020
+    status: pending
+    note: "An argument for spending your money and time on experiences while you can enjoy them, instead of saving for ever."
+  - title: "Rich Dad's Cashflow Quadrant"
+    cover: "covers/cashflow-quadrant.jpg"
+    author: "Robert T. Kiyosaki"
+    year: 1998
+    status: pending
+    note: "The four ways people earn money (employee, self-employed, business owner, investor), and how to move between them."
 ---
 
-Books I'm reading or have read, with a line on what each one is about.
+Books I'm reading, have read, or plan to read next, with a line on what each one is about.
