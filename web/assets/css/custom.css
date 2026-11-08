@@ -224,7 +224,8 @@ body.flex {
 .book-group { margin-top: 2rem; }
 .book-group h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: .75rem; }
 .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
-.book { display: flex; flex-direction: column; }
+.book { display: flex; gap: 1rem; align-items: flex-start; }
+.book-cover { width: 64px; height: auto; flex-shrink: 0; border-radius: .25rem; box-shadow: 0 1px 4px rgb(0 0 0 / .25); }
 .book h3 { font-size: 1.1rem; font-weight: 700; margin: 0; }
 .book p { margin: .25rem 0 0; }
 .book p:not(.kicker) { color: var(--muted); }
