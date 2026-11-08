@@ -68,7 +68,7 @@
 
 [[footer]]
   name = "Books"
-  pre = "book"
+  pre = "lightbulb"
   pageRef = "books"
   weight = 45
 
