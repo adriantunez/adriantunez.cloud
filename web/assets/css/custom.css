@@ -277,3 +277,9 @@ body.flex {
 @media(min-width: 640px) {
   .support-page .support-actions { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
 }
+
+/* Home closing: question + button on one row, stacked on mobile */
+.home-contact { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; }
+.home-contact p { display: flex; align-items: center; gap: .65rem; margin: 0; font-size: 1.15rem; }
+.home-contact .icon { width: 1.4em; height: 1.4em; flex: none; color: var(--accent); }
+.home-contact .cta { margin: 0; }

@@ -1,5 +1,5 @@
 ---
-title: "Adri Antunez's Cloud Site"
+title: "Adri Antunez"
 date: 2025-03-28T20:55:37+01:00
 draft: false
 summary: "I design, build and operate secure cloud and crypto platforms with AWS, Kubernetes and Terraform."
@@ -11,6 +11,6 @@ summary: "I design, build and operate secure cloud and crypto platforms with AWS
 >}}
 Platform Engineer
 AWS Cloud Architect
-Cloud & crypto platforms
+Crypto infrastructure builder
 Dad joke maker
 {{< /typeit >}}

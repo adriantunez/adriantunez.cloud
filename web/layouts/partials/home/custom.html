@@ -3,9 +3,9 @@
     <p class="kicker">Cloud · Crypto · Platform engineering</p>
     <h1>Hi, I’m {{ site.Params.author.name }}.</h1>
     <div class="typed-roles">{{ .Content }}</div>
-    <p>I build platforms that let teams ship safely, from AWS accounts to Kubernetes clusters, and share what I learn along the way.</p>
-    <a class="cta" href="#projects">Explore my projects ↓</a>
-    <a class="quiet" href="{{ "about/" | relURL }}">My background ↗</a>
+    <p>I build secure cloud platforms and write about what I learn running them in production.</p>
+    <a class="cta" href="{{ "posts/" | relURL }}">Read my writing →</a>
+    <a class="quiet" href="{{ "about/" | relURL }}">About me →</a>
   </div>
   {{ with resources.Get site.Params.author.imageMain }}
     <img src="{{ .RelPermalink }}" alt="Adri Antunez" width="{{ .Width }}" height="{{ .Height }}">
@@ -15,17 +15,17 @@
   <div>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a4.5 4.5 0 0 1-.4-9A6.5 6.5 0 0 1 18 8.8 5.1 5.1 0 1 1 18 19Z"/></svg>
     <h2>AWS &amp; Cloud</h2>
-    <p>AWS architecture, infrastructure as code, and lessons from production.</p>
+    <p>Multi-account AWS, infrastructure as code, and cost-aware architecture.</p>
   </div>
   <div>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 7 10-5 10 5-10 5ZM2 12l10 5 10-5M2 17l10 5 10-5"/></svg>
-    <h2>Platform &amp; DevSecOps</h2>
-    <p>Secure platforms and delivery workflows that developers can use with confidence.</p>
+    <h2>Platform &amp; Security</h2>
+    <p>Kubernetes platforms and delivery pipelines secure by default.</p>
   </div>
   <div>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 2-.5 2.5-2 .9-2.2-1.2-2.1 3.6 2 1.6-.2 2.4-2 1.6 2.1 3.6 2.5-.7 1.9 1.3.5 2.8h4l.6-2.8 1.9-1.3 2.5.7 2.1-3.6-2-1.6-.2-2.4 2-1.6-2.1-3.6-2.2 1.2-2-.9L14 2Z"/><circle cx="12" cy="11.4" r="3"/></svg>
-    <h2>Reliability &amp; Automation</h2>
-    <p>Monitoring systems, investigating failures, and automating repetitive operations.</p>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="9" width="6" height="6" rx="1"/><rect x="16" y="9" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><path d="M8 12h8M12 9v3"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M12 12v3"/></svg>
+    <h2>Crypto infrastructure</h2>
+    <p>Running blockchain and Lightning nodes reliably in production.</p>
   </div>
 </section>
 <section id="projects">
@@ -34,13 +34,13 @@
     <a class="panel project" href="https://github.com/adriantunez/adriantunez.cloud">
       <span class="kicker">AWS CDK / GitHub Actions</span>
       <h3>The infrastructure behind this site</h3>
-      <p>Follow a change from a pull request to a Hugo build served by CloudFront.</p>
+      <p>AWS CDK, CloudFront and GitHub Actions, with a live preview for every pull request.</p>
       <strong>Explore the repository ↗</strong>
     </a>
     <a class="panel project" href="{{ relref . "/posts/git-signed-commits" }}">
       <span class="kicker">Git / Security</span>
-      <h3>The Git signing experiment</h3>
-      <p>I tried impersonating a commit author to see exactly what GitHub verifies.</p>
+      <h3>Can you fake a Git commit?</h3>
+      <p>I impersonated a commit author to find out what GitHub actually verifies.</p>
       <strong>Read the experiment →</strong>
     </a>
   </div>
@@ -70,6 +70,6 @@
   {{ end }}
 {{ end }}
 <section class="home-contact">
-  <h2>Working on something similar?</h2>
-  <a class="quiet" href="{{ relref . "/contact" }}">Get in touch ↗</a>
+  <p>{{ partial "icon.html" "mug-hot" }}<span>Up for a coffee chat about cloud, platforms or crypto?</span></p>
+  <a class="cta" href="{{ relref . "/contact" }}">Say hi →</a>
 </section>
