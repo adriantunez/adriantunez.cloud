@@ -1,7 +1,7 @@
 {{ if ne .Params.showNewsletter false }}
 <section class="newsletter-card" aria-label="Newsletter signup">
   {{ if ne .Section "newsletter" }}<h2>Newsletter</h2>{{ end }}
-  <p id="newsletter-description">Get my notes on AWS, platform engineering, and what I learn running systems in production.</p>
+  <p id="newsletter-description">{{ .Params.newsletterDescription | default "Get my notes on AWS, platform engineering, and what I learn running systems in production." }}</p>
   <form class="space-y-3" action="https://assets.mailerlite.com/jsonp/1890631/forms/169761461082523558/subscribe"
     method="POST" id="newsletter-form">
     <div class="flex flex-col sm:flex-row">

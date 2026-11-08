@@ -8,6 +8,7 @@ showReadingTime: false
 showWordCount: false
 showComments: false
 sharingLinks: false
+newsletterDescription: "I share notes from what I read alongside what I learn building platforms. Get them in your inbox."
 build:
   publishResources: false # only publish the resized covers
 # status: reading | read | pending. cover: image path inside this folder (optional)
