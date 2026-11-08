@@ -79,6 +79,12 @@ books:
     year: 1997
     status: read
     note: "A fable about a burned-out lawyer who gives up his career and learns simple practices for a more balanced, purposeful life."
+  - title: "Recover Your Mind, Reconquer Your Life"
+    cover: "covers/recover-your-mind.jpg"
+    author: "Marian Rojas Estapé"
+    year: 2024
+    status: read
+    note: "How screens and constant stimulation hijack our attention and mood, and practical ways to win back focus and calm."
   - title: "Die with Zero"
     cover: "covers/die-with-zero.jpg"
     author: "Bill Perkins"
