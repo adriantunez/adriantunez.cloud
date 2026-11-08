@@ -218,3 +218,11 @@ body.flex {
 @media(max-width: 600px) {
   .writing-entry { grid-template-columns: minmax(0, 1fr); gap: .75rem; }
 }
+
+/* Books page */
+.book-group { margin-top: 2rem; }
+.book-group h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: .75rem; }
+.book { margin-bottom: .9rem; }
+.book h3 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+.book p { margin: .25rem 0 0; }
+.book p:not(.kicker) { color: var(--muted); }

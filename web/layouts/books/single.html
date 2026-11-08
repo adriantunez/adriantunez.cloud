@@ -1,0 +1,23 @@
+{{ define "main" }}
+<div class="contact-page books-page">
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  {{ $books := .Params.books }}
+  {{ $groups := slice (dict "status" "reading" "label" "Currently reading") (dict "status" "read" "label" "Read") }}
+  {{ range $groups }}
+    {{ $label := .label }}
+    {{ with where $books "status" .status }}
+      <section class="book-group">
+        <h2>{{ $label }}</h2>
+        {{ range . }}
+          <article class="panel book">
+            <h3>{{ if .url }}<a href="{{ .url }}">{{ .title }} ↗</a>{{ else }}{{ .title }}{{ end }}</h3>
+            <p class="kicker">{{ .author }} · {{ .year }}</p>
+            <p>{{ .note }}</p>
+          </article>
+        {{ end }}
+      </section>
+    {{ end }}
+  {{ end }}
+</div>
+{{ end }}
