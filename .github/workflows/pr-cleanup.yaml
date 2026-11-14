@@ -1,0 +1,39 @@
+name: PR Cleanup
+
+# Deletes a PR's preview (previews/pr<N>/) when the PR is closed or merged.
+# The bucket also expires previews/ after 30 days, in case this doesn't run.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  # Published by WebHostingStack, see infrastructure/config/config.ts
+  SSM_BUCKET_NAME: /web/prod/bucketName
+  SSM_DISTRIBUTION_ID: /web/prod/distributionId
+  PREFIX: previews/pr${{ github.event.pull_request.number }}
+
+jobs:
+  cleanup:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/PreviewOidcWebRole-prod
+          role-session-name: preview-cleanup
+          aws-region: eu-west-1
+          role-duration-seconds: 900
+
+      - name: Delete the preview and invalidate its cache
+        run: |
+          bucket=$(aws ssm get-parameter --name "$SSM_BUCKET_NAME" --query 'Parameter.Value' --output text)
+          dist_id=$(aws ssm get-parameter --name "$SSM_DISTRIBUTION_ID" --query 'Parameter.Value' --output text)
+          aws s3 rm "s3://${bucket}/${PREFIX}/" --recursive
+          aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/${PREFIX}/*" > /dev/null
+          echo "Removed ${PREFIX}/" >> "$GITHUB_STEP_SUMMARY"
