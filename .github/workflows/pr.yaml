@@ -7,6 +7,7 @@ permissions:
   contents: read
   id-token: write
   actions: write
+  pull-requests: write # preview comment
 
 concurrency:
   group: pr-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -21,7 +22,6 @@ jobs:
       ref: ${{ github.event.pull_request.head.sha }}
       filters: .github/filters.yml
 
-  # Just run a single test. It internally checks all envs
   cdk_tests:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     needs: dispatcher
@@ -29,53 +29,53 @@ jobs:
     with:
       AUDIT_LEVEL: moderate
 
-  # Matrix to allow testing diff in all environments
   cdk_diff:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     needs: dispatcher
-    uses: ./.github/workflows/reusable-cdk-diff.yml
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - cdk_environment: prod
-            web_main_domain_name: PROD_WEB_MAIN_DOMAIN_NAME
-            web_domain_names: PROD_WEB_DOMAIN_NAMES
-            diff_role_secret_key: AWS_PROD_DIFF_ROLE_ARN
-            web_ssm_sp_bucket_name: PROD_WEB_SSM_SP_BUCKET_NAME
-            WEB_SSM_SP_DISTRIBUTION_ID: PROD_WEB_SSM_SP_DISTRIBUTION_ID
+    uses: ./.github/workflows/reusable-cdk.yml
     with:
-      CDK_ENVIRONMENT: ${{ matrix.cdk_environment }}
-      WEB_MAIN_DOMAIN_NAME: ${{ vars[matrix.web_main_domain_name] }}
-      WEB_DOMAIN_NAMES: ${{ vars[matrix.web_domain_names] }}
-      WEB_SSM_SP_BUCKET_NAME: ${{ vars[matrix.web_ssm_sp_bucket_name] }}
-      WEB_SSM_SP_DISTRIBUTION_ID: ${{ vars[matrix.WEB_SSM_SP_DISTRIBUTION_ID] }}
-    secrets:
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      AWS_ACM_CERTIFICATE_ID: ${{ secrets.AWS_ACM_CERTIFICATE_ID }}
-      AWS_OIDC_ASSUME_ROLE: ${{ secrets[matrix.diff_role_secret_key] }}
+      COMMAND: diff
+      ROLE_NAME: DiffOidcCdkRole-prod
 
-  # Testing Hugo build
-  hugo:
+  # Builds the site and publishes it at https://pr<N>.preview.adriantunez.cloud/.
+  # Forks and Dependabot get no OIDC token, so they only build.
+  preview:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     needs: dispatcher
     uses: ./.github/workflows/reusable-hugo.yml
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - hugo_environment: production
-            hugo_configs: PROD_HUGO_CONFIGS
-            web_main_domain_name: PROD_WEB_MAIN_DOMAIN_NAME
     with:
-      WEB_MAIN_DOMAIN_NAME: ${{ vars[matrix.web_main_domain_name] }}
-      GHA_ENVIRONMENT: "" # Do not deploy, just run build (PR)
-      HUGO_ENVIRONMENT: ${{ matrix.hugo_environment }}
-      HUGO_CONFIGS: ${{ vars[matrix.hugo_configs] }}
+      HUGO_ENVIRONMENT: preview
+      BASE_URL: https://pr${{ github.event.pull_request.number }}.preview.adriantunez.cloud/
+      DEPLOY: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
+      ROLE_NAME: PreviewOidcWebRole-prod
+      S3_PREFIX: previews/pr${{ github.event.pull_request.number }}
+
+  preview_comment:
+    if: ${{ needs.preview.result == 'success' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
+    needs: preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post or update the preview link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          marker='<!-- pr-preview -->'
+          body="${marker}
+          **Preview:** https://pr${PR}.preview.adriantunez.cloud/ (commit \`${SHA::7}\`)"
+          id=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" | head -n1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/${REPO}/issues/comments/${id}" -f body="$body" > /dev/null
+          else
+            gh api -X POST "repos/${REPO}/issues/${PR}/comments" -f body="$body" > /dev/null
+          fi
 
   all-good:
     if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}
-    needs: [dispatcher, cdk_tests, cdk_diff, hugo]
+    needs: [dispatcher, cdk_tests, cdk_diff, preview, preview_comment]
     runs-on: ubuntu-latest
     steps:
       - run: exit 1
