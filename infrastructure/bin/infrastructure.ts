@@ -8,7 +8,7 @@ import { CertificateStack } from "../lib/certificate/certificateStack";
 import { WebHostingStack } from "../lib/web-hosting/webHostingStack";
 
 const app = new App();
-const account = process.env.CDK_DEFAULT_ACCOUNT;
+const account = config.account;
 const env = { account, region: config.region };
 
 new OIDCProviderStack(app, "OIDCProviderStack", {

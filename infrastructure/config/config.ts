@@ -1,8 +1,10 @@
-// Single production environment. Nothing here is secret: the AWS account
-// comes from the credentials the CDK CLI runs with (CDK_DEFAULT_ACCOUNT).
+// Single production environment. Nothing here is secret (the account ID is
+// also in cdk.context.json). Pinning the account makes CDK refuse to deploy
+// with credentials for any other account.
 const repository = "adriantunez/adriantunez.cloud";
 
 export const config = {
+  account: "149722328819",
   region: "eu-west-1",
   environment: "prod",
   tags: {
