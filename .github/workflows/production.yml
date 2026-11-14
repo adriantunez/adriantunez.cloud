@@ -51,6 +51,7 @@ jobs:
     needs: [cdk_tests, cdk_deploy]
     uses: ./.github/workflows/reusable-hugo.yml
     with:
+      DEPLOY: true
       GHA_ENVIRONMENT: prod-web
       HUGO_ENVIRONMENT: production
       HUGO_CONFIGS: ${{ vars.PROD_HUGO_CONFIGS }}
