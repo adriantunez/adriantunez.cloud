@@ -284,3 +284,8 @@ body.flex {
 .home-contact p { display: flex; align-items: center; gap: .65rem; margin: 0; font-size: 1.15rem; }
 .home-contact .icon { width: 1.4em; height: 1.4em; flex: none; color: var(--accent); }
 .home-contact .cta { margin: 0; }
+
+/* Date line on post cards, with an optional Coffee Shot badge */
+.post-meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem .75rem; }
+.coffee-shot { display: inline-flex; align-items: center; gap: .3em; color: var(--accent); font-size: .85rem; font-weight: 650; }
+.coffee-shot .icon { display: inline-block; width: 1em; height: 1em; }

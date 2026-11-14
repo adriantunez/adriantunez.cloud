@@ -8,7 +8,7 @@
         {{ $thumb := .Fill "480x270 webp q82" }}
         <img class="writing-thumbnail" src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async" alt="">
       {{ end }}
-      <div><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_medium" }}</time><h2>{{ .Title }}</h2><p>{{ .Summary | plainify }}</p></div>
+      <div>{{ partial "post-meta.html" . }}<h2>{{ .Title }}</h2><p>{{ .Summary | plainify }}</p></div>
     </a>
   {{ end }}
 </section>

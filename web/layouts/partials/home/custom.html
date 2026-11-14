@@ -58,7 +58,7 @@
                 {{ $thumb := .Fill "640x360 webp q82" }}
                 <img class="recent-thumbnail" src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async" alt="">
               {{ end }}
-              <time class="kicker" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_medium" }}</time>
+              <span class="kicker">{{ partial "post-meta.html" . }}</span>
               <h3>{{ .Title }}</h3>
               <p class="recent-description">{{ .Params.cardDescription | default (.Summary | plainify | truncate 110) }}</p>
             </a>

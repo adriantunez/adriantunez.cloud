@@ -1,0 +1,6 @@
+<span class="post-meta">
+  <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_medium" }}</time>
+  {{- if in (.Params.categories | default slice) "Coffee Shots" }}
+    <span class="coffee-shot">{{ partial "icon.html" "mug-hot" }}Coffee Shot</span>
+  {{- end }}
+</span>
