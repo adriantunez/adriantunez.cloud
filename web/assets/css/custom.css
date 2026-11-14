@@ -135,7 +135,8 @@ body.flex {
   color: var(--ink);
   border-color: var(--line);
 }
-.newsletter-card button[type=submit] { background: var(--accent); color: var(--canvas) !important; }
+.newsletter-card button[type=submit] { background: var(--accent); color: var(--canvas); font-weight: 700; }
+.newsletter-card button[type=submit]:hover { filter: brightness(1.1); }
 .newsletter-card #newsletter-privacy { margin: .75rem 0 0; }
 
 .brand-header, .brand { display: flex; align-items: center; gap: .6rem; }
