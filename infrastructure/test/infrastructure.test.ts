@@ -108,10 +108,11 @@ describe("stacks", () => {
         }),
       },
     );
-    Template.fromStack(stacks.hosting).resourceCountIs(
+    const records = Template.fromStack(stacks.hosting).findResources(
       "AWS::Route53::RecordSet",
-      3,
     );
+    const types = Object.values(records).map((r) => r.Properties.Type).sort();
+    expect(types).toEqual(["A", "A", "A", "AAAA", "AAAA", "AAAA"]);
   });
 
   test("preview role trusts pull requests and only writes under previews/", () => {
@@ -199,5 +200,22 @@ describe("edge function", () => {
     const response = run(host, uri);
     expect(response.statusCode).toBe(301);
     expect(response.headers.location.value).toBe(location);
+  });
+
+  test.each([
+    "/previews",
+    "/previews/",
+    "/previews/pr42/",
+    "/previews/pr42/index.html",
+  ])("adriantunez.cloud%s does not serve previews", (uri) => {
+    const response = run("adriantunez.cloud", uri);
+    expect(response.statusCode).toBeUndefined();
+    expect(response.uri).toBe("/404-not-found");
+  });
+
+  test("adriantunez.cloud/previews-guide/ is still served normally", () => {
+    expect(run("adriantunez.cloud", "/previews-guide/").uri).toBe(
+      "/previews-guide/index.html",
+    );
   });
 });
