@@ -11,12 +11,12 @@ showComments: false
 
 ## Long story short
 
-{{< lead >}}Learn by doing approach since I was a toddler{{< /lead >}}
+{{< lead >}}Learning by doing, ever since I was a toddler{{< /lead >}}
 
-I've always loved to tinker. Even as a toddler, I could spend hours playing with cables and exploring gadgets. They've always fascinated me! I remember a funny story from when I was 12: my dad brought home a broken computer, and I immediately wanted to repair it. I opened it up and started examining and touching the components, but unfortunately, I changed the power supply voltage input and caused a small explosion after plugging it in. That moment made me realize how much I wanted to understand what was happening inside those mysterious metal boxes.
+I've always loved to tinker. As a toddler, I could spend hours playing with cables and taking gadgets apart. When I was 12, my dad brought home a broken computer and I immediately wanted to fix it. I opened it up and started poking at the components, but I switched the power supply's input voltage and caused a small explosion when I plugged it in. That moment showed me how much I wanted to understand what was happening inside those mysterious metal boxes.
 
-After some years at university, I realized that learning was not enough. I wanted hands-on experience, so I started working on different projects, ranging from doing robotic training for school students to volunteering to help with networking configuration and practicalities at Campus Party Europe in Berlin.
+A few years into university, I knew classes weren't enough. I wanted hands-on experience, so I took on all kinds of projects, from teaching robotics to school students to volunteering on the network team at Campus Party Europe in Berlin.
 
 ![Adri Antunez at JOTB Workshop](img/me.jpg "Adri Antunez at J On The Beach workshop")
 
-I also love to step out of my comfort zone; for example, back in 2022, I faced one of my biggest fears: giving my first talk in front of hundreds of people. After that, I realized I enjoyed that fulfilling and empowered feeling. That was one of those life-changing moments, so I now embrace upcoming challenges.
+I also like stepping out of my comfort zone. In 2022, I faced one of my biggest fears: giving my first talk in front of hundreds of people. I found I loved the feeling afterwards, and it changed how I approach challenges: now I go looking for them.

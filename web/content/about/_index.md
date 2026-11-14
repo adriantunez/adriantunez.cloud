@@ -10,4 +10,4 @@ showWordCount: false
 showComments: false
 ---
 
-I’m Adri Antunez. I build cloud platforms and still like taking things apart to see how they work. That habit has taken me from repairing computers to running systems on AWS and sharing what I learn along the way.
+I’m Adri Antunez. I build cloud platforms and still like taking things apart to see how they work. That habit took me from repairing computers to running production systems on AWS.

@@ -10,19 +10,19 @@ showComments: false
 ---
 ## Main skills
 
-{{< lead >}}Technical skills and soft skills balance is a must{{< /lead >}}
+{{< lead >}}Good platforms need both solid tech and good teamwork{{< /lead >}}
 
 ### {{< icon "fork" >}} Technical skills
 
-Extensive experience with on-premise and public cloud platforms, particularly AWS. Proficient in various tools and services, covering testing, deployment, and active monitoring. Security is always at the forefront of my mind.
+Over a decade running production systems on AWS and on-prem: Kubernetes, Terraform and AWS CDK, CI/CD and observability, with security built in from the start. Lately, also Bitcoin, Lightning and Ethereum infrastructure in production.
 
 ### {{< icon "heart" >}} Soft skills
 
-Strong leadership, effective communication, thriving in challenging situations, and good problem-solving abilities, all seasoned with empathy and a positive working environment (even if people sometimes groan at my dad's jokes :smiling_face_with_tear:).
+Leading and communicating clearly, staying calm when things get hard, and solving problems with empathy. I care about a positive team atmosphere, even if people sometimes groan at my dad jokes :smiling_face_with_tear:.
 
 ## Resume
 
-It's cool to share my resume so that you can learn more about my background and interests, but I don't want to write it down here with a long, detailed list. I don't want to be that boring :grin:. So, I'll share some key details about my work experience, certifications, and education. Therefore, if you're interested in knowing more, you can always check my [profile in {{<icon"linkedin">}}LinkedIn](https://www.linkedin.com/in/adriantunez/) or ask me anything you might have using the [contact page]({{% relref "/contact/" %}}).
+Here are the highlights: where I've worked, my certifications and my education. For the full story, see my [{{<icon"linkedin">}} LinkedIn profile](https://www.linkedin.com/in/adriantunez/) or [get in touch]({{% relref "/contact/" %}}).
 
 ### Work experience
 
@@ -40,7 +40,7 @@ It's cool to share my resume so that you can learn more about my background and 
 
 ### Certifications
 
-Certifications are just the beginning, but they're a strong foundation in addition to the production experience. They also showcase my commitment to continuous learning and expertise. There might be more to come in this field, so stay tuned!
+Certifications complement production experience; here are the ones I hold.
 
 | Certificate                                      | Institution                                    | Date                              |
 | ------------------------------------------------ | ---------------------------------------------- | --------------------------------- |
@@ -56,16 +56,3 @@ Certifications are just the beginning, but they're a strong foundation in additi
 | Engineering Degree in Computer Science                 | Universitat Autònoma de Barcelona | {{<badge>}}7.91 / 10{{</badge>}} | {{<keyword>}}2009 - 2014{{</keyword>}} |
 
 {{<button href="cv.pdf" target="_self">}}{{<icon"download">}}My resume (.pdf){{</button>}}
-
-## Freelance work
-
-I'm always happy to be of help and contribute in challenging projects. Over the time, I've done several freelancing work. If you want to know more, you can check my profiles on the following platforms:
-
-| Platform        | Link                                                |
-| --------------- | --------------------------------------------------- |
-| Upwork          | [upwork.com/freelancers/~01393b60792e9c9bc8](https://www.upwork.com/freelancers/~01393b60792e9c9bc8) |
-| Malt           | [malt.es/profile/adriantunez](https://www.malt.es/profile/adriantunez)                     |
-| Worksible       | [worksible.com/adriantunez](https://app.worksible.com/freelance/adriantunez97901)                             |
-| Shakers       | [shakersworks.com/share-profile/6907e2662236035e872e595c](https://app.shakersworks.com/share-profile/6907e2662236035e872e595c)                             |
-
-In addition, you can always [contact me](/contact/) or drop me a message on my [{{<icon"linkedin">}} LinkedIn account](https://www.linkedin.com/in/adriantunez/) to get more information, or ask me anything you might have in mind. I'm always happy to chat :muscle:.
