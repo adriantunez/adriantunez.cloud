@@ -27,7 +27,7 @@ export const config = {
     distributionId: "/web/prod/distributionId",
   },
   oidcSubjects: {
-    cdkDiff: [`repo:${repository}:*`],
+    cdkDiff: [`repo:${repository}:pull_request`],
     cdkDeploy: [`repo:${repository}:environment:prod-infrastructure`],
     webDeploy: [`repo:${repository}:environment:prod-web`],
     // Pull request jobs without a GitHub environment (previews and cleanup)

@@ -115,6 +115,25 @@ describe("stacks", () => {
     expect(types).toEqual(["A", "A", "A", "AAAA", "AAAA", "AAAA"]);
   });
 
+  test("cdk diff role only trusts pull requests", () => {
+    Template.fromStack(stacks.cdkRoles).hasResourceProperties("AWS::IAM::Role", {
+      RoleName: "DiffOidcCdkRole-prod",
+      AssumeRolePolicyDocument: Match.objectLike({
+        Statement: [
+          Match.objectLike({
+            Condition: Match.objectLike({
+              StringLike: {
+                "token.actions.githubusercontent.com:sub": [
+                  "repo:adriantunez/adriantunez.cloud:pull_request",
+                ],
+              },
+            }),
+          }),
+        ],
+      }),
+    });
+  });
+
   test("preview role trusts pull requests and only writes under previews/", () => {
     const template = Template.fromStack(stacks.webRoles);
     template.hasResourceProperties("AWS::IAM::Role", {
