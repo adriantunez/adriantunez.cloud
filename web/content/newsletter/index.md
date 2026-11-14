@@ -1,7 +1,7 @@
 ---
 title: "Join the newsletter"
 date: 2025-11-04
-summary: "Subscribe for real-world DevOps, platform engineering and AWS insights. No spam, just practical lessons from running systems in production."
+summary: "New posts and notes from running platforms in production, straight to your inbox."
 draft: false
 showDate: false
 showReadingTime: false

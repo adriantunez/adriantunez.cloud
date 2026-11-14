@@ -1,6 +1,6 @@
 <section class="intro">
   <div>
-    <p class="kicker">Cloud · Crypto · Platform engineering</p>
+    <p class="kicker">Cloud · Platform engineering · Security</p>
     <h1>Hi, I’m {{ site.Params.author.name }}.</h1>
     <div class="typed-roles">{{ .Content }}</div>
     <p>I build secure cloud platforms and write about what I learn running them in production.</p>
@@ -14,18 +14,18 @@
 <section class="home-skills" aria-label="Skills">
   <div>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a4.5 4.5 0 0 1-.4-9A6.5 6.5 0 0 1 18 8.8 5.1 5.1 0 1 1 18 19Z"/></svg>
-    <h2>AWS &amp; Cloud</h2>
-    <p>Multi-account AWS, infrastructure as code, and cost-aware architecture.</p>
+    <h2>Cloud &amp; Infrastructure</h2>
+    <p>Designing and running AWS and on-prem environments as code.</p>
   </div>
   <div>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 7 10-5 10 5-10 5ZM2 12l10 5 10-5M2 17l10 5 10-5"/></svg>
     <h2>Platform &amp; Security</h2>
-    <p>Kubernetes platforms and delivery pipelines secure by default.</p>
+    <p>Building secure, cost-efficient Kubernetes platforms with GitOps.</p>
   </div>
   <div>
     <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="9" width="6" height="6" rx="1"/><rect x="16" y="9" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><path d="M8 12h8M12 9v3"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M12 12v3"/></svg>
-    <h2>Crypto infrastructure</h2>
-    <p>Running blockchain and Lightning nodes reliably in production.</p>
+    <h2>Blockchain &amp; Lightning</h2>
+    <p>Running Bitcoin, Lightning and Ethereum nodes reliably in production.</p>
   </div>
 </section>
 <section id="projects">
@@ -34,13 +34,13 @@
     <a class="panel project" href="https://github.com/adriantunez/adriantunez.cloud">
       <span class="kicker">AWS CDK / GitHub Actions</span>
       <h3>The infrastructure behind this site</h3>
-      <p>AWS CDK, CloudFront and GitHub Actions, with a live preview for every pull request.</p>
+      <p>Serverless static hosting on AWS that costs almost nothing and handles millions of visitors out of the box.</p>
       <strong>Explore the repository ↗</strong>
     </a>
     <a class="panel project" href="{{ relref . "/posts/git-signed-commits" }}">
       <span class="kicker">Git / Security</span>
       <h3>Can you fake a Git commit?</h3>
-      <p>I impersonated a commit author to find out what GitHub actually verifies.</p>
+      <p>I faked a commit as Linus Torvalds to see what GitHub actually verifies.</p>
       <strong>Read the experiment →</strong>
     </a>
   </div>

@@ -1,7 +1,7 @@
 ---
 title: "Contact"
 date: 2025-04-01
-summary: "Get in touch with me and share your thoughts, questions, suggestions, or an exciting project you'd like to work on together!"
+summary: "Questions, feedback or a project in mind? Get in touch."
 draft: false
 showDate: false
 showReadingTime: false
