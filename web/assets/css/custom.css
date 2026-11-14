@@ -237,7 +237,9 @@ body.flex {
 }
 
 /* Support widget (Lightning + Buy Me a Coffee) */
-.support h2 { margin: 0; }
+.support { padding: clamp(1rem, 3vw, 1.75rem); } /* same padding as the newsletter card */
+.support h2 { margin: 0; font-weight: 700; font-size: 1.35rem; letter-spacing: normal; }
+.support h2 + p { margin-block: .5rem 0; }
 .support-page .support { margin-top: 1.5rem; }
 .support-tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--line); }
 .support h2 ~ .support-tabs { margin-top: 1rem; }
@@ -258,7 +260,7 @@ body.flex {
   border: 1px solid var(--line); border-radius: .45rem; background: var(--canvas); font-size: .9rem; color: var(--muted);
 }
 .support-custom label:focus-within { border-color: var(--accent); }
-.support-custom input { flex: 1; min-width: 0; padding-block: .45rem; background: none; border: 0; outline: 0; color: var(--ink); font: inherit; font-weight: 650; }
+.support-custom input { flex: 1; min-width: 0; padding-block: .45rem; background: none; border: 0; outline: 0; color: var(--ink); font: inherit; font-weight: 650; padding-inline: 0; }
 .support-custom button { background: var(--accent); color: var(--canvas); border-color: var(--accent); }
 .support-invoice { margin-top: 1rem; }
 .support-qr { max-width: 15rem; margin-inline: auto; border-radius: .45rem; overflow: hidden; }
