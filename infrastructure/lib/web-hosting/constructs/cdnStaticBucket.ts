@@ -22,6 +22,7 @@ export interface cdnStaticBucketProps {
   certificate: ICertificate;
   domainNames: string[];
   viewerRequestFn: CloudFrontFunction;
+  pricingPlanWebAclArn: string;
 }
 
 export class cdnStaticBucket extends Construct {
@@ -77,6 +78,7 @@ export class cdnStaticBucket extends Construct {
 
     this.distribution = new Distribution(this, "Distribution", {
       priceClass: PriceClass.PRICE_CLASS_100,
+      webAclId: props.pricingPlanWebAclArn,
       domainNames: props.domainNames,
       certificate: props.certificate,
       httpVersion: HttpVersion.HTTP2_AND_3,

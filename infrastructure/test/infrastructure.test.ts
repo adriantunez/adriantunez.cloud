@@ -105,6 +105,7 @@ describe("stacks", () => {
           DefaultCacheBehavior: Match.objectLike({
             ViewerProtocolPolicy: "redirect-to-https",
           }),
+          WebACLId: config.web.pricingPlanWebAclArn,
         }),
       },
     );

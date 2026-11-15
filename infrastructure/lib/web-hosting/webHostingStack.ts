@@ -42,6 +42,7 @@ export class WebHostingStack extends Stack {
       certificate: props.certificate,
       domainNames,
       viewerRequestFn: edgeCfFunction.cfFunction,
+      pricingPlanWebAclArn: props.web.pricingPlanWebAclArn,
     });
 
     new DnsAliasesDistId(this, "DnsAliasesDistId", {

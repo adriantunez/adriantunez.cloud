@@ -16,6 +16,9 @@ export const config = {
     previewDomainName: "preview.adriantunez.cloud",
     previewPrefix: "previews",
     previewExpirationDays: 30,
+    // Created by CloudFront with the flat-rate pricing plan; referenced, not managed
+    pricingPlanWebAclArn:
+      "arn:aws:wafv2:us-east-1:149722328819:global/webacl/CreatedByCloudFront-f7ceb97f/c9c90348-bb23-412c-bd2b-750c8d8eb0ac",
   },
   ssm: {
     providerArn: "/providers/github/oidc/arn",
