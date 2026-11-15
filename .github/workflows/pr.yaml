@@ -10,8 +10,8 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: pr-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true # only cancel in-progress runs for PRs
+  group: preview-pr${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   dispatcher:
@@ -30,7 +30,7 @@ jobs:
       AUDIT_LEVEL: high
 
   cdk_diff:
-    if: ${{ needs.dispatcher.outputs.changes == 'true' }}
+    if: ${{ needs.dispatcher.outputs.changes == 'true' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
     needs: dispatcher
     uses: ./.github/workflows/reusable-cdk.yml
     with:
@@ -56,20 +56,9 @@ jobs:
       - name: Post or update the preview link
         env:
           GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          marker='<!-- pr-preview -->'
-          body="${marker}
-          **Preview:** https://pr${PR}.preview.adriantunez.cloud/ (commit \`${SHA::7}\`)"
-          id=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate \
-            --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" | head -n1)
-          if [ -n "$id" ]; then
-            gh api -X PATCH "repos/${REPO}/issues/comments/${id}" -f body="$body" > /dev/null
-          else
-            gh api -X POST "repos/${REPO}/issues/${PR}/comments" -f body="$body" > /dev/null
-          fi
+        run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --create-if-none --body "**Preview:** https://pr${PR}.preview.adriantunez.cloud/ (\`${SHA::7}\`)"
 
   all-good:
     if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}

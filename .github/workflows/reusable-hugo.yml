@@ -116,5 +116,4 @@ jobs:
       - name: Invalidate CloudFront CDN
         env:
           DIST_ID: ${{ steps.ssm.outputs.distribution_id }}
-          PREFIX: ${{ inputs.S3_PREFIX }}
-        run: aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/${PREFIX:+$PREFIX/}*"
+        run: aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/*"

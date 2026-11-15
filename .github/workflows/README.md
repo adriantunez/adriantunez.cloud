@@ -43,7 +43,8 @@ Pull requests from forks and Dependabot get no AWS credentials, so they only bui
 ### `pr-cleanup.yaml` - Preview Cleanup
 
 - **Trigger**: Pull request closed or merged
-- **Steps**: Delete `previews/pr<N>/` and invalidate its cache
+- **Steps**: Delete `previews/pr<N>/` and invalidate the cache
+- Shares the `preview-pr<N>` concurrency group with `pr.yaml`, so closing a PR cancels a running preview deploy first
 
 ## Reusable Workflows
 
@@ -66,7 +67,7 @@ Pull requests from forks and Dependabot get no AWS credentials, so they only bui
 
 - Hugo build with minification (version read from `.tool-versions`)
 - Optional upload: bucket root for production, `S3_PREFIX` (e.g. `previews/pr12`) for previews
-- CloudFront invalidation of the uploaded path only
+- CloudFront invalidation of `/*` (preview URLs are rewritten before caching, so a narrower path could miss cached pages)
 
 ## Environments
 

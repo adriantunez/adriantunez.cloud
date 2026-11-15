@@ -8,6 +8,10 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: preview-pr${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 env:
   SSM_BUCKET_NAME: /web/prod/bucketName
   SSM_DISTRIBUTION_ID: /web/prod/distributionId
@@ -31,5 +35,5 @@ jobs:
           bucket=$(aws ssm get-parameter --name "$SSM_BUCKET_NAME" --query 'Parameter.Value' --output text)
           dist_id=$(aws ssm get-parameter --name "$SSM_DISTRIBUTION_ID" --query 'Parameter.Value' --output text)
           aws s3 rm "s3://${bucket}/${PREFIX}/" --recursive
-          aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/${PREFIX}/*" > /dev/null
+          aws cloudfront create-invalidation --distribution-id "$dist_id" --paths "/*" > /dev/null
           echo "Removed ${PREFIX}/" >> "$GITHUB_STEP_SUMMARY"
