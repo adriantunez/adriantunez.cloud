@@ -39,7 +39,7 @@ env:
 jobs:
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ${{ vars.HUGO_PATH }}
@@ -75,7 +75,7 @@ jobs:
 
   deploy:
     name: deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     if: ${{ inputs.DEPLOY }}
     environment:

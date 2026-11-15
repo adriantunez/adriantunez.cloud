@@ -51,7 +51,7 @@ jobs:
   preview_comment:
     if: ${{ needs.preview.result == 'success' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
     needs: preview
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Post or update the preview link
         env:
@@ -63,7 +63,7 @@ jobs:
   all-good:
     if: ${{ !cancelled() && needs.dispatcher.result == 'success' }}
     needs: [dispatcher, cdk_tests, cdk_diff, preview, preview_comment]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - run: exit 1
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}

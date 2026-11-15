@@ -26,7 +26,7 @@ env:
 jobs:
   cdk:
     name: ${{ inputs.COMMAND }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: ${{ inputs.GHA_ENVIRONMENT }}
     defaults:
       run:
