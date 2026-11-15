@@ -28,7 +28,7 @@ jobs:
     needs: dispatcher
     uses: ./.github/workflows/reusable-cdk-tests.yml
     with:
-      AUDIT_LEVEL: moderate
+      AUDIT_LEVEL: high
 
   cdk_deploy:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
