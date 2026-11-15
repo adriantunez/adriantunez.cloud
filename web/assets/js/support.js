@@ -46,7 +46,7 @@ function initSupport(root) {
       button.textContent = "Copied";
       setTimeout(function () { button.textContent = label; }, 1500);
     } catch {
-      status.textContent = "Couldn’t copy. Select the text and copy it manually.";
+      status.textContent = "Couldn’t copy. Scan the QR code or use Open in wallet instead.";
     }
   });
 
