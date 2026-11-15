@@ -17,8 +17,8 @@ This directory contains all Infrastructure as Code (IaC) and deployment automati
 
 1. **OIDCProviderStack**: GitHub OIDC identity provider
 2. **OidcCdkRolesStack-prod**: IAM roles for `cdk diff` (pull requests) and `cdk deploy` (releases)
-3. **CertificateStack-prod**: ACM certificate in us-east-1 for `adriantunez.cloud`, `www` and `*.preview`
-4. **WebHostingStack-prod**: S3 bucket, CloudFront distribution, CloudFront function and Route 53 records
+3. **CertificateStack-prod**: ACM certificate in us-east-1 for `adriantunez.cloud`, `www` and `*.preview`, plus a CAA record that only lets Amazon issue certificates
+4. **WebHostingStack-prod**: S3 bucket, CloudFront distribution, CloudFront functions and Route 53 records
 5. **OidcWebRolesStack-prod**: IAM roles to upload the site (whole bucket) and PR previews (`previews/` only)
 
 ### PR previews
@@ -32,7 +32,20 @@ Production and previews share one bucket and one distribution:
 
 ### CloudFront pricing plan
 
-The distribution is on a CloudFront flat-rate pricing plan. CloudFront created its WAF web ACL with the subscription and doesn't allow removing or replacing it, so CDK only references it (`pricingPlanWebAclArn` in `config/config.ts`) and doesn't manage it.
+The distribution is on a CloudFront flat-rate pricing plan. CloudFront created its WAF web ACL with the subscription and doesn't allow removing or replacing it, so CDK only references it (`pricingPlanWebAclArn` in `config/config.ts`) and doesn't manage it. The Free plan also requires `PriceClass_All` and an AWS-managed response headers policy.
+
+### Browser caching
+
+`cf-response-headers.js` sets `Cache-Control` per response:
+
+| Response | Cache-Control |
+| --- | --- |
+| Fingerprinted files (Hugo hash in the name) | `public, max-age=31536000, immutable` |
+| HTML pages | `public, max-age=0, must-revalidate` |
+| Other files | `public, max-age=86400` |
+| Errors | `no-cache` |
+
+The CloudFront edge keeps its own 1-day cache, and every deploy invalidates `/*`.
 
 ## Directory Structure
 
@@ -54,7 +67,8 @@ infrastructure/
 ├── config/
 │   └── config.ts                 # Account, region, domains, SSM names, OIDC subjects
 ├── functions/
-│   └── cf-webredirect.js         # CloudFront function: redirects, clean URLs, preview routing
+│   ├── cf-webredirect.js         # Viewer request: redirects, clean URLs, preview routing
+│   └── cf-response-headers.js    # Viewer response: security headers and browser caching
 ├── test/
 │   └── infrastructure.test.ts    # Infrastructure tests
 ├── package.json                  # Node.js dependencies
@@ -94,7 +108,8 @@ npx cdk bootstrap aws://<account>/eu-west-1 aws://<account>/us-east-1
 - **Least Privilege IAM**: Minimal required permissions for each role
 - **Encrypted Storage**: S3 bucket encryption enabled
 - **HTTPS Only**: SSL/TLS enforcement across all resources
-- **Content Security**: CloudFront security headers
+- **Security Headers**: HSTS, `frame-ancestors 'none'`, Permissions-Policy, and no `Server` header, set by a CloudFront function (the Free plan doesn't allow custom response headers policies)
+- **CAA Record**: Only Amazon can issue certificates for the domain
 
 ## Integration with GitHub Actions
 
