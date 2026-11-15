@@ -37,11 +37,11 @@ export class WebHostingStack extends Stack {
       },
     });
 
-    const securityHeadersFunction = new EdgeCfFunction(
+    const responseHeadersFunction = new EdgeCfFunction(
       this,
-      "SecurityHeadersFunction",
+      "ResponseHeadersFunction",
       {
-        functionRelPath: "functions/cf-security-headers.js",
+        functionRelPath: "functions/cf-response-headers.js",
         replacements: {},
       },
     );
@@ -51,7 +51,7 @@ export class WebHostingStack extends Stack {
       certificate: props.certificate,
       domainNames,
       viewerRequestFn: edgeCfFunction.cfFunction,
-      viewerResponseFn: securityHeadersFunction.cfFunction,
+      viewerResponseFn: responseHeadersFunction.cfFunction,
       pricingPlanWebAclArn: props.web.pricingPlanWebAclArn,
     });
 

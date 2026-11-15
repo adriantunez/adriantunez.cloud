@@ -257,37 +257,70 @@ describe("edge function", () => {
   });
 });
 
-describe("security headers function", () => {
+describe("response headers function", () => {
   const code = renderFunctionCode({
-    functionRelPath: "functions/cf-security-headers.js",
+    functionRelPath: "functions/cf-response-headers.js",
     replacements: {},
   });
   const handler = new Function(`${code}; return handler;`)();
-  const response = handler({
-    response: {
-      statusCode: 200,
-      headers: {
-        server: { value: "AmazonS3" },
-        "x-amz-server-side-encryption": { value: "AES256" },
-        "x-xss-protection": { value: "1; mode=block" },
+  const run = (uri: string, statusCode = 200) =>
+    handler({
+      request: { uri },
+      response: {
+        statusCode,
+        headers: {
+          server: { value: "AmazonS3" },
+          "x-amz-server-side-encryption": { value: "AES256" },
+          "x-xss-protection": { value: "1; mode=block" },
+        },
       },
-    },
-  });
+    }).headers;
 
   test("adds security headers", () => {
-    expect(response.headers["strict-transport-security"].value).toBe(
+    const headers = run("/index.html");
+    expect(headers["strict-transport-security"].value).toBe(
       "max-age=31536000; includeSubDomains",
     );
-    expect(response.headers["content-security-policy"].value).toBe(
+    expect(headers["content-security-policy"].value).toBe(
       "frame-ancestors 'none'",
     );
-    expect(response.headers["x-frame-options"].value).toBe("DENY");
-    expect(response.headers["permissions-policy"]).toBeDefined();
-    expect(response.headers["x-xss-protection"].value).toBe("0");
+    expect(headers["x-frame-options"].value).toBe("DENY");
+    expect(headers["permissions-policy"]).toBeDefined();
+    expect(headers["x-xss-protection"].value).toBe("0");
   });
 
   test("removes server and storage headers", () => {
-    expect(response.headers.server).toBeUndefined();
-    expect(response.headers["x-amz-server-side-encryption"]).toBeUndefined();
+    const headers = run("/index.html");
+    expect(headers.server).toBeUndefined();
+    expect(headers["x-amz-server-side-encryption"]).toBeUndefined();
+  });
+
+  test.each([
+    [
+      "/css/main.bundle.min.0fccaedf1b2c3d4e5f6a7b8c9d0e1f2a.css",
+      200,
+      "public, max-age=31536000, immutable",
+    ],
+    [
+      "/previews/pr12/js/support.bundle.min.ec9d72af1b2c3d4e5f6a7b8c9d.js",
+      200,
+      "public, max-age=31536000, immutable",
+    ],
+    [
+      "/img/me_hu_fae3431e27f3284a.jpeg",
+      200,
+      "public, max-age=31536000, immutable",
+    ],
+    ["/index.html", 200, "public, max-age=0, must-revalidate"],
+    [
+      "/posts/git-signed-commits/index.html",
+      304,
+      "public, max-age=0, must-revalidate",
+    ],
+    ["/favicon.ico", 200, "public, max-age=86400"],
+    ["/about/career/cv.pdf", 200, "public, max-age=86400"],
+    ["/missing/index.html", 404, "no-cache"],
+  ])("%s (%i) gets %s", (uri, status, expected) => {
+    expect(run(uri, status)["cache-control"].value).toBe(expected);
   });
 });
