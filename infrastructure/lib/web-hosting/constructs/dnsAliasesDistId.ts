@@ -1,5 +1,10 @@
 import { Distribution } from "aws-cdk-lib/aws-cloudfront";
-import { ARecord, HostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
+import {
+  AaaaRecord,
+  ARecord,
+  HostedZone,
+  RecordTarget,
+} from "aws-cdk-lib/aws-route53";
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
 import { Construct } from "constructs";
 
@@ -17,14 +22,12 @@ export class DnsAliasesDistId extends Construct {
       domainName: props.hostedZoneName,
     });
 
+    const target = RecordTarget.fromAlias(
+      new CloudFrontTarget(props.distribution),
+    );
     props.domainNames.forEach((recordName, i) => {
-      new ARecord(this, `AliasARecord${i}`, {
-        zone,
-        recordName,
-        target: RecordTarget.fromAlias(
-          new CloudFrontTarget(props.distribution),
-        ),
-      });
+      new ARecord(this, `AliasARecord${i}`, { zone, recordName, target });
+      new AaaaRecord(this, `AliasAaaaRecord${i}`, { zone, recordName, target });
     });
   }
 }

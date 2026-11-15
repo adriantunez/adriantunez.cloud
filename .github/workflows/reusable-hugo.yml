@@ -3,45 +3,43 @@ name: reusable-hugo
 on:
   workflow_call:
     inputs:
-      GHA_ENVIRONMENT:
-        description: "Define GitHub Actions environment (empty: no deploy)"
+      HUGO_ENVIRONMENT:
+        description: "Hugo environment (production or preview); loads config/<environment>/ on top of config/_default/"
+        type: string
+        required: true
+      BASE_URL:
+        description: "Site URL the build links to (e.g. https://pr12.preview.adriantunez.cloud/)"
+        type: string
+        required: true
+      DEPLOY:
+        description: "Upload the site to S3 after building (false: build only)"
+        type: boolean
+        default: false
+      ROLE_NAME:
+        description: "IAM role to assume to upload (e.g. DeployOidcWebRole-prod); required to deploy"
         type: string
         default: ""
-      HUGO_ENVIRONMENT:
-        description: "Define Hugo environment"
+      GHA_ENVIRONMENT:
+        description: "GitHub Actions environment for the deploy job (empty: none, e.g. PR previews)"
         type: string
-        required: true
-      HUGO_CONFIGS:
-        description: "Define Hugo config files, comma separated"
+        default: ""
+      S3_PREFIX:
+        description: "Bucket folder to upload to (empty: bucket root, i.e. production; e.g. previews/pr12)"
         type: string
-        required: true
-      WEB_MAIN_DOMAIN_NAME:
-        description: "Define Hugo base URL"
-        type: string
-        required: true
-      WEB_SSM_SP_BUCKET_NAME:
-        description: "Define SSM parameter for web S3 bucket name"
-        type: string
-        required: false # only required to deploy
-      WEB_SSM_SP_DISTRIBUTION_ID:
-        description: "Define SSM parameter for web CloudFront distribution ID"
-        type: string
-        required: false # only required to deploy
-    secrets:
-      AWS_OIDC_ASSUME_ROLE:
-        required: false # only required to deploy
+        default: ""
 
 permissions:
   id-token: write
   contents: read
 
 env:
-  HUGO_VERSION: "0.148.2"
+  SSM_BUCKET_NAME: /web/prod/bucketName
+  SSM_DISTRIBUTION_ID: /web/prod/distributionId
 
 jobs:
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ${{ vars.HUGO_PATH }}
@@ -51,22 +49,25 @@ jobs:
         with:
           submodules: recursive # get hugo theme submodule
 
+      - name: Read Hugo version from .tool-versions
+        working-directory: .
+        run: echo "HUGO_VERSION=$(awk '$1 == "hugo" { print $2 }' .tool-versions)" >> "$GITHUB_ENV"
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # was: peaceiris/actions-hugo@v3
         with:
+          extended: true
           hugo-version: ${{ env.HUGO_VERSION }}
 
       - name: Build Hugo site
-        run: |
-          hugo -d output/ \
-          --environment ${{ inputs.HUGO_ENVIRONMENT }} \
-          --minify -d output/ \
-          --baseURL https://${{ inputs.WEB_MAIN_DOMAIN_NAME }}/ \
-          --config ${{ inputs.HUGO_CONFIGS }}
+        env:
+          HUGO_ENVIRONMENT: ${{ inputs.HUGO_ENVIRONMENT }}
+          BASE_URL: ${{ inputs.BASE_URL }}
+        run: hugo --environment "$HUGO_ENVIRONMENT" --baseURL "$BASE_URL" --minify -d output/
 
       - name: Upload Hugo artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # was: actions/upload-artifact@v3
-        if: ${{ inputs.GHA_ENVIRONMENT }}
+        if: ${{ inputs.DEPLOY }}
         with:
           name: hugo-site
           path: ${{ vars.HUGO_PATH }}/output/
@@ -74,37 +75,45 @@ jobs:
 
   deploy:
     name: deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
-    if: ${{ inputs.GHA_ENVIRONMENT }}
+    if: ${{ inputs.DEPLOY }}
     environment:
       name: ${{ inputs.GHA_ENVIRONMENT }}
-      url: https://${{ inputs.WEB_MAIN_DOMAIN_NAME }}
+      url: ${{ inputs.BASE_URL }}
     steps:
       - name: Download Hugo artifact
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # was: actions/download-artifact@v3
         with:
           name: hugo-site
-          path: ${{ vars.HUGO_PATH }}/output/
+          path: output/
 
       - name: Configure AWS credentials for deployment
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # was: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ASSUME_ROLE }}
-          role-session-name: hugo-${{ inputs.GHA_ENVIRONMENT }}
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/${{ inputs.ROLE_NAME }}
+          role-session-name: hugo-deploy
           aws-region: eu-west-1
-          role-duration-seconds: 7200
+          role-duration-seconds: 3600
 
       - name: Read SSM params (bucket & distribution)
         id: ssm
         run: |
-          BUCKET_NAME=$(aws ssm get-parameter --name "${{ inputs.WEB_SSM_SP_BUCKET_NAME }}" --query 'Parameter.Value' --output text)
-          DIST_ID=$(aws ssm get-parameter --name "${{ inputs.WEB_SSM_SP_DISTRIBUTION_ID }}" --query 'Parameter.Value' --output text)
+          echo "bucket=$(aws ssm get-parameter --name "$SSM_BUCKET_NAME" --query 'Parameter.Value' --output text)" >> "$GITHUB_OUTPUT"
+          echo "distribution_id=$(aws ssm get-parameter --name "$SSM_DISTRIBUTION_ID" --query 'Parameter.Value' --output text)" >> "$GITHUB_OUTPUT"
 
-          echo "bucket=${BUCKET_NAME}" >> "$GITHUB_OUTPUT"
-          echo "distribution_id=${DIST_ID}" >> "$GITHUB_OUTPUT"
       - name: Push to S3
-        run: aws s3 sync ${{ vars.HUGO_PATH }}/output/ s3://${{ steps.ssm.outputs.bucket }}/ --delete
+        env:
+          BUCKET: ${{ steps.ssm.outputs.bucket }}
+          PREFIX: ${{ inputs.S3_PREFIX }}
+        run: |
+          if [ -n "$PREFIX" ]; then
+            aws s3 sync output/ "s3://${BUCKET}/${PREFIX}/" --delete
+          else
+            aws s3 sync output/ "s3://${BUCKET}/" --delete --exclude "previews/*"
+          fi
 
       - name: Invalidate CloudFront CDN
-        run: aws cloudfront create-invalidation --distribution-id ${{ steps.ssm.outputs.distribution_id }} --paths "/*"
+        env:
+          DIST_ID: ${{ steps.ssm.outputs.distribution_id }}
+        run: aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/*"

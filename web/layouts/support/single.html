@@ -1,0 +1,7 @@
+{{ define "main" }}
+<div class="contact-page support-page">
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  {{ partial "support.html" (dict "page" . "heading" false) }}
+</div>
+{{ end }}

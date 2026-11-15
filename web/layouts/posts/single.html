@@ -1,0 +1,37 @@
+{{ define "main" }}
+<div class="reading-grid">
+  <article class="story">
+    <a class="kicker" href="{{ .CurrentSection.RelPermalink }}">Writing</a>
+    {{ range .GetTerms "categories" }}<span aria-hidden="true"> › </span><a class="kicker" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.summary }}<p class="dek">{{ . }}</p>{{ end }}
+    <p class="byline">{{ with resources.Get site.Params.author.image }}<img src="{{ (.Fill "72x72").RelPermalink }}" alt="">{{ end }}
+      {{ site.Params.author.name }} · {{ .Date | time.Format ":date_medium" }} · {{ .ReadingTime }} min read
+    </p>
+    {{ with .Resources.GetMatch "featured*" }}{{ $cover := .Resize "1200x webp q82" }}<img class="cover" src="{{ $cover.RelPermalink }}" width="{{ $cover.Width }}" height="{{ $cover.Height }}" alt="">{{ end }}
+    {{ with .Fragments.Headings }}<div class="contents panel"><strong>In this post</strong>{{ $.TableOfContents }}</div>{{ end }}
+    <div class="article-content prose dark:prose-invert">{{ .Content }}</div>
+    {{ partial "sharing-links.html" . }}
+    {{ partial "article-pagination.html" . }}
+    {{ if .Params.showComments | default site.Params.article.showComments }}{{ partial "comments.html" . }}{{ end }}
+  </article>
+  <aside class="rail">
+    <section class="panel">
+      {{ with resources.Get site.Params.author.image }}<img class="avatar" src="{{ (.Fill "192x192").RelPermalink }}" alt="">{{ end }}
+      <h2>{{ site.Params.author.name }}</h2><p>{{ site.Params.author.headline }}</p>
+      <p>{{ site.Params.author.bio }}</p>
+      {{ partial "author-links.html" . }}
+    </section>
+    <section class="panel"><h2>More writing</h2>
+      {{ range first 3 (where (where site.RegularPages "Section" "posts") "Permalink" "ne" .Permalink) }}
+      <a class="related-row" href="{{ .RelPermalink }}">{{ with .Resources.GetMatch "featured*" }}<img alt="" src="{{ (.Fill "96x96").RelPermalink }}">{{ end }}<span>{{ .Title }}<small>{{ .ReadingTime }} min read</small></span></a>
+      {{ end }}
+    </section>
+    <section class="panel"><h2>Categories</h2>
+      {{ range site.Taxonomies.categories.ByCount }}<a class="chip" href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }} ({{ .Count }})</a>{{ end }}
+    </section>
+  {{ partial "newsletter.html" . }}
+    {{ partial "support.html" (dict "page" . "heading" true) }}
+  </aside>
+</div>
+{{ end }}

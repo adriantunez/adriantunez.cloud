@@ -1,0 +1,4 @@
+error:
+  404_title: "Page not found"
+  404_error: "Error 404"
+  404_description: "This page doesn't exist (anymore). It may have moved, or the link may be wrong."

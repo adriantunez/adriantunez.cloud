@@ -1,53 +1,52 @@
-// Newsletter form functionality
 document.addEventListener("DOMContentLoaded", function () {
-  const newsletterForm = document.getElementById("newsletter-form");
-  if (!newsletterForm) return;
-
-  // Form submission handler
-  newsletterForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById("newsletter-name").value;
-    const email = document.getElementById("newsletter-email").value;
-    const button = e.target.querySelector('button[type="submit"]');
-
-    if (!name || !email || !email.includes("@") || !email.includes(".")) return;
-
-    button.textContent = "Joining the newsletter...";
-    button.disabled = true;
-
-    fetch(e.target.action, {
-      method: "POST",
-      body: new FormData(e.target),
-      mode: "no-cors",
-    })
-      .then(() => {
-        e.target.style.display = "none";
-        document.getElementById("newsletter-description").style.display =
-          "none";
-        document.getElementById("newsletter-privacy").style.display = "none";
-        document.getElementById("success-message").classList.remove("hidden");
-      })
-      .catch(() => {
-        button.textContent = "Try Again";
+  const newsletter = document.getElementById("newsletter-form");
+  if (newsletter) {
+    newsletter.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const button = newsletter.querySelector('button[type="submit"]');
+      if (button.disabled) return;
+      const status = document.getElementById("newsletter-status");
+      button.disabled = true;
+      status.textContent = "Submitting…";
+      try {
+        await fetch(newsletter.action, {
+          method: "POST",
+          body: new FormData(newsletter),
+          mode: "no-cors",
+        });
+        newsletter.hidden = true;
+        status.textContent = "Check your inbox for the confirmation email.";
+      } catch {
+        status.textContent = "Couldn’t submit the form. Please try again.";
+      } finally {
         button.disabled = false;
-        alert("Something went wrong. Please try again.");
-      });
-  });
-
-  // Email placeholder handler
-  const emailInput = document.getElementById("newsletter-email");
-  if (emailInput) {
-    emailInput.addEventListener("input", function (e) {
-      e.target.placeholder = e.target.value.length > 0 ? "" : "your@email.com";
+      }
     });
   }
 
-  // Name placeholder handler
-  const nameInput = document.getElementById("newsletter-name");
-  if (nameInput) {
-    nameInput.addEventListener("input", function (e) {
-      e.target.placeholder = e.target.value.length > 0 ? "" : "Your name";
+  const contactForm = document.getElementById("contact-form");
+  if (contactForm) {
+    contactForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const button = contactForm.querySelector('button[type="submit"]');
+      if (button.disabled) return;
+      const status = document.getElementById("contact-status");
+      button.disabled = true;
+      status.textContent = "Sending your message…";
+      try {
+        const response = await fetch(contactForm.action, {
+          method: "POST",
+          body: new FormData(contactForm),
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) throw new Error("Submission failed");
+        contactForm.hidden = true;
+        status.textContent = "Message sent. Thanks for reaching out!";
+      } catch {
+        status.textContent = "Your message could not be sent. Please try again or message me on LinkedIn.";
+      } finally {
+        button.disabled = false;
+      }
     });
   }
 });

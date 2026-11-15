@@ -1,9 +1,9 @@
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Construct } from "constructs";
-import { SsmStringParameterNamesWebHosting } from "../../../config/environments";
 
 export interface SsmWebHostingOutputsProps {
-  ssmStringParameterNamesWebHosting: SsmStringParameterNamesWebHosting;
+  bucketNameParam: string;
+  distributionIdParam: string;
   bucketName: string;
   distributionId: string;
 }
@@ -13,12 +13,12 @@ export class SsmWebHostingOutputs extends Construct {
     super(scope, id);
 
     new StringParameter(this, "BucketNameParam", {
-      parameterName: props.ssmStringParameterNamesWebHosting.bucketName,
+      parameterName: props.bucketNameParam,
       stringValue: props.bucketName,
     });
 
     new StringParameter(this, "DistributionIdParam", {
-      parameterName: props.ssmStringParameterNamesWebHosting.distributionId,
+      parameterName: props.distributionIdParam,
       stringValue: props.distributionId,
     });
   }

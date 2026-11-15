@@ -1,61 +1,60 @@
 #!/usr/bin/env node
-import { App } from "aws-cdk-lib";
-import { envConfig, Environment, globalTags } from "../config/environments";
+import { App, Stack, Tags } from "aws-cdk-lib";
+import { config } from "../config/config";
 import { OIDCProviderStack } from "../lib/oidc/oidcProviderStack";
 import { OidcCdkRolesStack } from "../lib/oidc/oidcCdkRolesStack";
 import { OidcWebRolesStack } from "../lib/oidc/oidcWebRolesStack";
+import { CertificateStack } from "../lib/certificate/certificateStack";
 import { WebHostingStack } from "../lib/web-hosting/webHostingStack";
 
 const app = new App();
-const currEnv =
-  (app.node.tryGetContext("environment") as Environment) || Environment.PROD;
-const cfg = envConfig[currEnv];
+const account = config.account;
+const env = { account, region: config.region };
 
-console.log("Selected config:");
-console.log(cfg);
+new OIDCProviderStack(app, "OIDCProviderStack", {
+  env,
+  ssmProviderArn: config.ssm.providerArn,
+});
 
-// Supercharge tags with env-specific ones
-const customTags = {
-  ...globalTags,
-  Environment: currEnv,
-};
+new OidcCdkRolesStack(app, `OidcCdkRolesStack-${config.environment}`, {
+  env,
+  envName: config.environment,
+  ssmProviderArn: config.ssm.providerArn,
+  diffSubjects: config.oidcSubjects.cdkDiff,
+  deploySubjects: config.oidcSubjects.cdkDeploy,
+});
 
-// NOTE: Provider is an unique resource. Manage it only via production environment
-// Export its ARN via a SSM Parameter Store to be read from the rest of envs
-if (currEnv == Environment.PROD) {
-  // Create OIDC provider only for prod
-  const oidcProviderStack = new OIDCProviderStack(app, `OIDCProviderStack`, {
-    env: cfg.awsConfig,
-    currEnv: cfg.currEnv,
-    globalTags: customTags,
-    ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
-  });
+const certificate = new CertificateStack(
+  app,
+  `CertificateStack-${config.environment}`,
+  {
+    env: { account, region: "us-east-1" },
+    crossRegionReferences: true,
+    web: config.web,
+  },
+);
+
+new WebHostingStack(app, `WebHostingStack-${config.environment}`, {
+  env,
+  crossRegionReferences: true,
+  certificate: certificate.certificate,
+  web: config.web,
+  ssm: config.ssm,
+});
+
+new OidcWebRolesStack(app, `OidcWebRolesStack-${config.environment}`, {
+  env,
+  envName: config.environment,
+  ssm: config.ssm,
+  previewPrefix: config.web.previewPrefix,
+  deploySubjects: config.oidcSubjects.webDeploy,
+  previewSubjects: config.oidcSubjects.webPreview,
+});
+
+for (const stack of app.node.children) {
+  if (stack instanceof Stack) {
+    Object.entries(config.tags).forEach(([key, value]) =>
+      Tags.of(stack).add(key, value),
+    );
+  }
 }
-
-// Create CDK OIDC Roles (diff and deploy) to be used by any app that relies on CDK
-new OidcCdkRolesStack(app, `OidcCdkRolesStack-${cfg.currEnv}`, {
-  env: cfg.awsConfig,
-  currEnv: cfg.currEnv,
-  globalTags: customTags,
-  ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
-  oidcSubjects: cfg.oidcSubjectsCdk,
-});
-
-// Create web hosting
-new WebHostingStack(app, `WebHostingStack-${cfg.currEnv}`, {
-  env: cfg.awsConfig,
-  currEnv: cfg.currEnv,
-  globalTags: customTags,
-  webHosting: cfg.webHosting,
-});
-
-// Create web OIDC Roles (diff and deploy) to be used by any app that relies on webHosting
-new OidcWebRolesStack(app, `OidcWebRolesStack-${cfg.currEnv}`, {
-  env: cfg.awsConfig,
-  currEnv: cfg.currEnv,
-  globalTags: customTags,
-  ssmStringParameterProviderArn: cfg.ssmStringParameterProviderArn,
-  oidcSubjects: cfg.oidcSubjectsWeb,
-  ssmStringParameterNamesWebHosting:
-    cfg.webHosting.ssmStringParameterNamesWebHosting,
-});

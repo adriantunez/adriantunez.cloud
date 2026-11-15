@@ -5,23 +5,23 @@ import {
   Function as CloudFrontFunction,
   Distribution,
   FunctionEventType,
-  HeadersFrameOption,
-  HeadersReferrerPolicy,
   HttpVersion,
   PriceClass,
   ResponseHeadersPolicy,
   ViewerProtocolPolicy,
 } from "aws-cdk-lib/aws-cloudfront";
 import { Construct } from "constructs";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Duration } from "aws-cdk-lib";
 import { S3BucketOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
 
 export interface cdnStaticBucketProps {
   bucket: Bucket;
-  certificateArn: string;
+  certificate: ICertificate;
   domainNames: string[];
   viewerRequestFn: CloudFrontFunction;
+  viewerResponseFn: CloudFrontFunction;
+  pricingPlanWebAclArn: string;
 }
 
 export class cdnStaticBucket extends Construct {
@@ -30,62 +30,11 @@ export class cdnStaticBucket extends Construct {
   constructor(scope: Construct, id: string, props: cdnStaticBucketProps) {
     super(scope, id);
 
-    // Certificate is shared between several apps. Get it here
-    const cert = Certificate.fromCertificateArn(
-      this,
-      "ImportedCert",
-      props.certificateArn,
-    );
-
-    // Security headers
-    const responseHeadersPolicy = new ResponseHeadersPolicy(
-      this,
-      "SecurityResponseHeadersPolicy",
-      {
-        securityHeadersBehavior: {
-          strictTransportSecurity: {
-            accessControlMaxAge: Duration.days(365),
-            includeSubdomains: true,
-            preload: true,
-            override: true,
-          },
-          xssProtection: {
-            protection: true,
-            modeBlock: true,
-            override: true,
-          },
-          frameOptions: {
-            frameOption: HeadersFrameOption.DENY,
-            override: true,
-          },
-          contentTypeOptions: { override: true },
-          referrerPolicy: {
-            referrerPolicy:
-              HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
-            override: true,
-          },
-          contentSecurityPolicy: {
-            contentSecurityPolicy: "frame-ancestors 'none';",
-            override: true,
-          },
-        },
-        customHeadersBehavior: {
-          customHeaders: [
-            {
-              header: "Cache-Control",
-              value: `max-age=${Duration.hours(12).toSeconds()}, public`,
-              override: true,
-            },
-          ],
-        },
-        removeHeaders: ["Server"],
-      },
-    );
-
     this.distribution = new Distribution(this, "Distribution", {
-      priceClass: PriceClass.PRICE_CLASS_100,
+      priceClass: PriceClass.PRICE_CLASS_ALL,
+      webAclId: props.pricingPlanWebAclArn,
       domainNames: props.domainNames,
-      certificate: cert,
+      certificate: props.certificate,
       httpVersion: HttpVersion.HTTP2_AND_3,
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(props.bucket),
@@ -93,11 +42,15 @@ export class cdnStaticBucket extends Construct {
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: CachePolicy.CACHING_OPTIMIZED,
-        responseHeadersPolicy: responseHeadersPolicy,
+        responseHeadersPolicy: ResponseHeadersPolicy.SECURITY_HEADERS,
         functionAssociations: [
           {
             function: props.viewerRequestFn,
             eventType: FunctionEventType.VIEWER_REQUEST,
+          },
+          {
+            function: props.viewerResponseFn,
+            eventType: FunctionEventType.VIEWER_RESPONSE,
           },
         ],
       },

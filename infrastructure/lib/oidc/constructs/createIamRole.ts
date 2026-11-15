@@ -18,7 +18,7 @@ export interface CreateIamRoleProps {
 export function CreateIamRole(
   scope: Construct,
   name: string,
-  props: CreateIamRoleProps
+  props: CreateIamRoleProps,
 ): Role {
   const role = new Role(scope, name, {
     assumedBy: new WebIdentityPrincipal(props.oidcProviderArn, {
@@ -40,7 +40,7 @@ export function CreateIamRole(
         effect: Effect.ALLOW,
         actions: ["sts:AssumeRole"],
         resources: props.resourcesArray,
-      })
+      }),
     );
   }
 

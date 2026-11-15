@@ -1,0 +1,33 @@
+{{ define "main" }}
+<div class="contact-page books-page">
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  {{ $page := . }}
+  {{ $books := .Params.books }}
+  {{ $groups := slice (dict "status" "reading" "label" "Currently reading") (dict "status" "read" "label" "Read") (dict "status" "pending" "label" "Up next") }}
+  {{ range $groups }}
+    {{ $label := .label }}
+    {{ with where $books "status" .status }}
+      <section class="book-group">
+        <h2>{{ $label }}</h2>
+        <div class="book-grid">
+        {{ range . }}
+          <article class="panel book">
+            {{ with and .cover ($page.Resources.Get .cover) }}
+              {{ $thumb := .Resize "160x webp q80" }}
+              <img class="book-cover" src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async" alt="">
+            {{ end }}
+            <div>
+            <h3>{{ if .url }}<a href="{{ .url }}">{{ .title }} ↗</a>{{ else }}{{ .title }}{{ end }}</h3>
+            <p class="kicker">{{ .author }} · {{ .year }}</p>
+            <p>{{ .note }}</p>
+            </div>
+          </article>
+        {{ end }}
+        </div>
+      </section>
+    {{ end }}
+  {{ end }}
+  {{ partial "newsletter.html" . }}
+</div>
+{{ end }}

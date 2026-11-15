@@ -1,10 +1,7 @@
-import { Stack, StackProps, Tags } from "aws-cdk-lib";
+import { Stack, StackProps } from "aws-cdk-lib";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Construct } from "constructs";
-import {
-  WebHosting,
-  type Environment,
-  type GlobalTags,
-} from "../../config/environments";
+import type { SsmConfig, WebConfig } from "../../config/config";
 import { StaticBucket } from "./constructs/staticBucket";
 import { EdgeCfFunction } from "./constructs/edgeCfFunction";
 import { DnsAliasesDistId } from "./constructs/dnsAliasesDistId";
@@ -12,50 +9,63 @@ import { cdnStaticBucket } from "./constructs/cdnStaticBucket";
 import { SsmWebHostingOutputs } from "./constructs/SsmWebHostingOutputs";
 
 interface WebHostingStackProps extends StackProps {
-  currEnv: Environment;
-  globalTags: GlobalTags;
-  webHosting: WebHosting;
+  certificate: ICertificate;
+  web: WebConfig;
+  ssm: SsmConfig;
 }
 
 export class WebHostingStack extends Stack {
   constructor(scope: Construct, id: string, props: WebHostingStackProps) {
     super(scope, id, props);
 
-    // Create the S3 bucket for the static site
-    const staticBucket = new StaticBucket(this, "StaticBucket");
+    const domainNames = [
+      ...props.web.domainNames,
+      `*.${props.web.previewDomainName}`,
+    ];
 
-    // Create the Edge Redirect Function for CloudFront
+    const staticBucket = new StaticBucket(this, "StaticBucket", {
+      previewPrefix: props.web.previewPrefix,
+      previewExpirationDays: props.web.previewExpirationDays,
+    });
+
     const edgeCfFunction = new EdgeCfFunction(this, "EdgeCfFunction", {
       functionRelPath: "functions/cf-webredirect.js",
-      mainDomainName: props.webHosting.mainDomainName,
+      replacements: {
+        MAIN_DOMAIN: props.web.mainDomainName,
+        PREVIEW_DOMAIN: props.web.previewDomainName,
+        PREVIEW_PREFIX: props.web.previewPrefix,
+      },
     });
 
-    // Create CloudFront Distribution CDN with the S3 bucket as origin, custom policies, and functions
+    const responseHeadersFunction = new EdgeCfFunction(
+      this,
+      "ResponseHeadersFunction",
+      {
+        functionRelPath: "functions/cf-response-headers.js",
+        replacements: {},
+      },
+    );
+
     const cdn = new cdnStaticBucket(this, "Cdn", {
       bucket: staticBucket.bucket,
-      certificateArn: `arn:aws:acm:us-east-1:${props.env?.account}:certificate/${props.webHosting.certificateId}`,
-      domainNames: props.webHosting.domainNames,
+      certificate: props.certificate,
+      domainNames,
       viewerRequestFn: edgeCfFunction.cfFunction,
+      viewerResponseFn: responseHeadersFunction.cfFunction,
+      pricingPlanWebAclArn: props.web.pricingPlanWebAclArn,
     });
 
-    // DNS Aliases To CloudFront Distribution
     new DnsAliasesDistId(this, "DnsAliasesDistId", {
-      hostedZoneName: props.webHosting.hostedZoneName,
-      domainNames: props.webHosting.domainNames,
+      hostedZoneName: props.web.hostedZoneName,
+      domainNames,
       distribution: cdn.distribution,
     });
 
-    // Export SSM Parameter Store created values
     new SsmWebHostingOutputs(this, "SsmWebHostingOutputs", {
-      ssmStringParameterNamesWebHosting:
-        props.webHosting.ssmStringParameterNamesWebHosting,
+      bucketNameParam: props.ssm.bucketName,
+      distributionIdParam: props.ssm.distributionId,
       bucketName: staticBucket.bucket.bucketName,
       distributionId: cdn.distribution.distributionId,
-    });
-
-    // Tag all resources created by the construct (using globalTags)
-    Object.entries(props.globalTags).forEach(([key, value]) => {
-      Tags.of(this).add(key, value);
     });
   }
 }

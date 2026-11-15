@@ -1,0 +1,15 @@
+{{ define "main" }}
+<section class="writing-index">
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  {{ range .RegularPages.ByDate.Reverse }}
+    <a class="writing-entry" href="{{ .RelPermalink }}">
+      {{ with .Resources.GetMatch "featured*" }}
+        {{ $thumb := .Fill "480x270 webp q82" }}
+        <img class="writing-thumbnail" src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async" alt="">
+      {{ end }}
+      <div>{{ partial "post-meta.html" . }}<h2>{{ .Title }}</h2><p>{{ .Summary | plainify }}</p></div>
+    </a>
+  {{ end }}
+</section>
+{{ end }}

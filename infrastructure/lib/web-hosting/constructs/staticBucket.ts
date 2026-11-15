@@ -1,27 +1,36 @@
-import { RemovalPolicy } from "aws-cdk-lib";
+import { Duration, RemovalPolicy } from "aws-cdk-lib";
 import {
   BlockPublicAccess,
   Bucket,
   BucketEncryption,
-  BucketProps,
 } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
+
+export interface StaticBucketProps {
+  previewPrefix: string;
+  previewExpirationDays: number;
+}
 
 export class StaticBucket extends Construct {
   public readonly bucket: Bucket;
 
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, props: StaticBucketProps) {
     super(scope, id);
 
-    const bucketProps: BucketProps = {
+    this.bucket = new Bucket(this, "Bucket", {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,
       enforceSSL: true,
       versioned: false, // Bucket contents can be easily recreated from GitHub
       removalPolicy: RemovalPolicy.RETAIN,
       autoDeleteObjects: false,
-    };
-
-    this.bucket = new Bucket(this, "Bucket", bucketProps);
+      lifecycleRules: [
+        {
+          id: "ExpirePreviews",
+          prefix: `${props.previewPrefix}/`,
+          expiration: Duration.days(props.previewExpirationDays),
+        },
+      ],
+    });
   }
 }

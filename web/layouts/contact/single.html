@@ -1,0 +1,16 @@
+{{ define "main" }}
+<div class="contact-page">
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  <form class="panel contact-fields" action="https://formspree.io/f/xqakozwp" method="post" id="contact-form">
+    <label>Your name<input name="name" autocomplete="name" required></label>
+    <label>Your email<input type="email" name="email" autocomplete="email" required></label>
+    <label>Subject<input name="subject" required></label>
+    <label>Your message<textarea name="message" rows="6" required></textarea></label>
+    <button type="submit">Send message</button>
+  </form>
+  <p id="contact-status" role="status" aria-live="polite"></p>
+  <p>You can also <a class="quiet" href="https://www.linkedin.com/in/adriantunez/">message me on LinkedIn ↗</a>.</p>
+  {{ partial "newsletter.html" . }}
+</div>
+{{ end }}

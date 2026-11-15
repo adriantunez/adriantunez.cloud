@@ -1,41 +1,75 @@
-{{ $disableImageOptimization := .Site.Params.disableImageOptimization | default false }}
-
-<section class="flex flex-flex items-center justify-center text-center gap-6 mt-10">
+<section class="intro">
   <div>
-    <!-- Author details -->
-    <h1 class="text-4xl font-extrabold">
-      {{ .Site.Params.Author.name | default .Site.Title }}
-    </h1>
-
-    <h2 class="text-xl text-neutral-500 dark:text-neutral-400">
-      {{ .Content | markdownify }}
-    </h2>
-    <div class="mt-1 text-2xl flex justify-center items-center">
-      {{ partialCached "author-links.html" . }}
-    </div>
+    <p class="kicker">Cloud · Platform engineering · Security</p>
+    <h1>Hi, I’m {{ site.Params.author.name }}.</h1>
+    <div class="typed-roles">{{ .Content }}</div>
+    <p>I build secure cloud platforms and write about what I learn running them in production.</p>
+    <a class="cta" href="{{ "posts/" | relURL }}">Read my writing →</a>
+    <a class="quiet" href="{{ "about/" | relURL }}">About me →</a>
+  </div>
+  {{ with resources.Get site.Params.author.imageMain }}
+    <img src="{{ .RelPermalink }}" alt="Adri Antunez" width="{{ .Width }}" height="{{ .Height }}">
+  {{ end }}
+</section>
+<section class="home-skills" aria-label="Skills">
+  <div>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19a4.5 4.5 0 0 1-.4-9A6.5 6.5 0 0 1 18 8.8 5.1 5.1 0 1 1 18 19Z"/></svg>
+    <h2>Cloud &amp; Infrastructure</h2>
+    <p>Designing and running AWS and on-prem environments as code.</p>
   </div>
   <div>
-    <!-- Author main image -->
-    {{ with .Site.Params.Author.imageMain }}
-    {{ $authorImage := "" }}
-    {{ if or (strings.HasPrefix . "http:") (strings.HasPrefix . "https:") }}
-    {{ $authorImage = resources.GetRemote . }}
-    {{ else }}
-    {{ $authorImage = resources.Get . }}
-    {{ end }}
-    {{ if $authorImage }}
-    {{ if not $disableImageOptimization }}
-    {{ $authorImage = $authorImage.Fill (print "344x556 q" ( $.Site.Params.Author.imagequality | default "96" )) }}
-    {{ end }}
-    <img class="mb-2" width="344" height="556" alt="{{ $.Site.Params.Author.name | default "Author" }}"
-      src="{{ $authorImage.RelPermalink }}" />
-    {{ end }}
-    {{ end }}
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 7 10-5 10 5-10 5ZM2 12l10 5 10-5M2 17l10 5 10-5"/></svg>
+    <h2>Platform &amp; Security</h2>
+    <p>Building secure, cost-efficient Kubernetes platforms with GitOps.</p>
+  </div>
+  <div>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="9" width="6" height="6" rx="1"/><rect x="16" y="9" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><path d="M8 12h8M12 9v3"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M12 12v3"/></svg>
+    <h2>Blockchain &amp; Lightning</h2>
+    <p>Running Bitcoin, Lightning and Ethereum nodes reliably in production.</p>
   </div>
 </section>
-
-<section>
-  {{ partial "recent-articles/main.html" . }}
+<section id="projects">
+  <h2>Selected projects</h2>
+  <div class="project-grid">
+    <a class="panel project" href="https://github.com/adriantunez/adriantunez.cloud">
+      <span class="kicker">AWS CDK / GitHub Actions</span>
+      <h3>The infrastructure behind this site</h3>
+      <p>Serverless static hosting on AWS that costs almost nothing and handles millions of visitors out of the box.</p>
+      <strong>Explore the repository ↗</strong>
+    </a>
+    <a class="panel project" href="{{ relref . "/posts/git-signed-commits" }}">
+      <span class="kicker">Git / Security</span>
+      <h3>Can you fake a Git commit?</h3>
+      <p>I faked a commit as Linus Torvalds to see what GitHub actually verifies.</p>
+      <strong>Read the experiment →</strong>
+    </a>
+  </div>
 </section>
-
-{{ partial "newsletter.html" . }}
+{{ if site.Params.homepage.showRecent }}
+  {{ with site.GetPage "/posts" }}
+    {{ $archive := .RelPermalink }}
+    {{ with first site.Params.homepage.showRecentItems .RegularPages.ByDate.Reverse }}
+      <section class="home-writing" aria-labelledby="recent-posts">
+        <h2 id="recent-posts">Recent posts</h2>
+        <div class="recent-grid">
+          {{ range . }}
+            <a class="panel project" href="{{ .RelPermalink }}">
+              {{ with .Resources.GetMatch "featured*" }}
+                {{ $thumb := .Fill "640x360 webp q82" }}
+                <img class="recent-thumbnail" src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" decoding="async" alt="">
+              {{ end }}
+              <span class="kicker">{{ partial "post-meta.html" . }}</span>
+              <h3>{{ .Title }}</h3>
+              <p class="recent-description">{{ .Params.cardDescription | default (.Summary | plainify | truncate 110) }}</p>
+            </a>
+          {{ end }}
+        </div>
+        <a class="quiet" href="{{ $archive }}">All writing →</a>
+      </section>
+    {{ end }}
+  {{ end }}
+{{ end }}
+<section class="home-contact">
+  <p>{{ partial "icon.html" "mug-hot" }}<span>Up for a coffee chat about cloud, platforms or crypto?</span></p>
+  <a class="cta" href="{{ relref . "/contact" }}">Say hi →</a>
+</section>

@@ -1,0 +1,11 @@
+<header class="main-menu brand-header">
+  <a class="brand" href="{{ site.Home.RelPermalink }}">
+    {{ with resources.Get site.Params.logo }}{{ .Content | safeHTML }}{{ end }}
+    <span>{{ site.Title }}</span>
+  </a>
+  <div class="hidden md:flex">{{ partial "header/components/desktop-menu.html" . }}</div>
+  {{ with site.GetPage "/contact" }}
+    {{ if ne $.RelPermalink .RelPermalink }}<a class="header-contact" href="{{ .RelPermalink }}">Get in touch ↗</a>{{ end }}
+  {{ end }}
+  <div class="flex md:hidden">{{ partial "header/components/mobile-menu.html" . }}</div>
+</header>

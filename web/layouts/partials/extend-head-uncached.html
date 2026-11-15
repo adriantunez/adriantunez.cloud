@@ -1,0 +1,18 @@
+{{/* Robots: noindex taxonomy and term pages to avoid duplicate content */}}
+{{ if and (not .Site.Params.robots) (not .Params.robots) }}
+  {{ if or (eq .Kind "taxonomy") (eq .Kind "term") }}
+    <meta name="robots" content="noindex, follow">
+  {{ end }}
+{{ end }}
+
+{{/* Newsletter form JS */}}
+{{ $alg := .Site.Params.fingerprintAlgorithm | default "sha512" }}
+{{ with resources.Get "js/newsletter.js" }}
+  {{ $js := . | resources.Minify | resources.Fingerprint $alg }}
+  <script defer type="text/javascript" src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+{{ end }}
+
+{{/* Analytics in all environments (Umami has domain filtering) */}}
+{{ if not hugo.IsProduction }}
+  {{ partial "analytics/main.html" . }}
+{{ end }}
