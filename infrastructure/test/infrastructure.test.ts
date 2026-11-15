@@ -106,6 +106,7 @@ describe("stacks", () => {
             ViewerProtocolPolicy: "redirect-to-https",
           }),
           WebACLId: config.web.pricingPlanWebAclArn,
+          PriceClass: "PriceClass_All",
         }),
       },
     );

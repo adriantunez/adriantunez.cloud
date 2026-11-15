@@ -5,8 +5,6 @@ import {
   Function as CloudFrontFunction,
   Distribution,
   FunctionEventType,
-  HeadersFrameOption,
-  HeadersReferrerPolicy,
   HttpVersion,
   PriceClass,
   ResponseHeadersPolicy,
@@ -31,53 +29,8 @@ export class cdnStaticBucket extends Construct {
   constructor(scope: Construct, id: string, props: cdnStaticBucketProps) {
     super(scope, id);
 
-    // Security headers
-    const responseHeadersPolicy = new ResponseHeadersPolicy(
-      this,
-      "SecurityResponseHeadersPolicy",
-      {
-        securityHeadersBehavior: {
-          strictTransportSecurity: {
-            accessControlMaxAge: Duration.days(365),
-            includeSubdomains: true,
-            preload: true,
-            override: true,
-          },
-          xssProtection: {
-            protection: true,
-            modeBlock: true,
-            override: true,
-          },
-          frameOptions: {
-            frameOption: HeadersFrameOption.DENY,
-            override: true,
-          },
-          contentTypeOptions: { override: true },
-          referrerPolicy: {
-            referrerPolicy:
-              HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
-            override: true,
-          },
-          contentSecurityPolicy: {
-            contentSecurityPolicy: "frame-ancestors 'none';",
-            override: true,
-          },
-        },
-        customHeadersBehavior: {
-          customHeaders: [
-            {
-              header: "Cache-Control",
-              value: `max-age=${Duration.hours(12).toSeconds()}, public`,
-              override: true,
-            },
-          ],
-        },
-        removeHeaders: ["Server"],
-      },
-    );
-
     this.distribution = new Distribution(this, "Distribution", {
-      priceClass: PriceClass.PRICE_CLASS_100,
+      priceClass: PriceClass.PRICE_CLASS_ALL,
       webAclId: props.pricingPlanWebAclArn,
       domainNames: props.domainNames,
       certificate: props.certificate,
@@ -88,7 +41,7 @@ export class cdnStaticBucket extends Construct {
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: CachePolicy.CACHING_OPTIMIZED,
-        responseHeadersPolicy: responseHeadersPolicy,
+        responseHeadersPolicy: ResponseHeadersPolicy.SECURITY_HEADERS,
         functionAssociations: [
           {
             function: props.viewerRequestFn,
