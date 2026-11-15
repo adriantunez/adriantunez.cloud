@@ -9,7 +9,6 @@ import path = require("path");
 
 export interface EdgeCfFunctionProps {
   functionRelPath: string;
-  // Each KEY replaces every %%KEY%% placeholder in the function code
   replacements: Record<string, string>;
 }
 

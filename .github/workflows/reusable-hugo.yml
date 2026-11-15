@@ -1,9 +1,5 @@
 name: reusable-hugo
 
-# Builds the Hugo site and, optionally, uploads it to the site bucket.
-# - Production: bucket root, keeping the previews/ folder untouched.
-# - PR preview: previews/pr<N>/ only.
-
 on:
   workflow_call:
     inputs:
@@ -37,7 +33,6 @@ permissions:
   contents: read
 
 env:
-  # Published by WebHostingStack, see infrastructure/config/config.ts
   SSM_BUCKET_NAME: /web/prod/bucketName
   SSM_DISTRIBUTION_ID: /web/prod/distributionId
 
@@ -84,7 +79,7 @@ jobs:
     needs: build
     if: ${{ inputs.DEPLOY }}
     environment:
-      name: ${{ inputs.GHA_ENVIRONMENT }} # empty: job runs without an environment
+      name: ${{ inputs.GHA_ENVIRONMENT }}
       url: ${{ inputs.BASE_URL }}
     steps:
       - name: Download Hugo artifact
@@ -107,8 +102,6 @@ jobs:
           echo "bucket=$(aws ssm get-parameter --name "$SSM_BUCKET_NAME" --query 'Parameter.Value' --output text)" >> "$GITHUB_OUTPUT"
           echo "distribution_id=$(aws ssm get-parameter --name "$SSM_DISTRIBUTION_ID" --query 'Parameter.Value' --output text)" >> "$GITHUB_OUTPUT"
 
-      # Production syncs the bucket root but leaves PR previews alone.
-      # A preview only touches its own folder (previews/pr<N>/).
       - name: Push to S3
         env:
           BUCKET: ${{ steps.ssm.outputs.bucket }}
@@ -120,8 +113,6 @@ jobs:
             aws s3 sync output/ "s3://${BUCKET}/" --delete --exclude "previews/*"
           fi
 
-      # The edge function rewrites preview URLs before the cache, so a preview is cached
-      # under /previews/pr<N>/ and only that folder needs invalidating.
       - name: Invalidate CloudFront CDN
         env:
           DIST_ID: ${{ steps.ssm.outputs.distribution_id }}

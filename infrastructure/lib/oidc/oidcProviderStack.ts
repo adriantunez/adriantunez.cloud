@@ -7,7 +7,6 @@ interface OIDCProviderStackProps extends StackProps {
   ssmProviderArn: string;
 }
 
-// GitHub OIDC provider (one per account). Its ARN is shared via SSM.
 export class OIDCProviderStack extends Stack {
   constructor(scope: Construct, id: string, props: OIDCProviderStackProps) {
     super(scope, id, props);

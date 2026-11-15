@@ -14,9 +14,6 @@ interface OidcWebRolesStackProps extends StackProps {
   previewSubjects: string[];
 }
 
-// Roles GitHub Actions assumes to upload the Hugo site.
-// - Deploy: the whole bucket (production releases).
-// - Preview: only the previews prefix (pull requests).
 export class OidcWebRolesStack extends Stack {
   constructor(scope: Construct, id: string, props: OidcWebRolesStackProps) {
     super(scope, id, props);
@@ -42,8 +39,6 @@ export class OidcWebRolesStack extends Stack {
       spBucketName.stringValue,
     );
 
-    // Shared permissions: read the SSM outputs and invalidate the CDN.
-    // CloudFront can't scope invalidations by path, so both roles get the distribution.
     const grantCommon = (role: Role) => {
       spBucketName.grantRead(role);
       spDistributionId.grantRead(role);

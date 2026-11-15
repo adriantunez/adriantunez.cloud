@@ -1,6 +1,3 @@
-// Single production environment. Nothing here is secret (the account ID is
-// also in cdk.context.json). Pinning the account makes CDK refuse to deploy
-// with credentials for any other account.
 const repository = "adriantunez/adriantunez.cloud";
 
 export const config = {
@@ -16,7 +13,6 @@ export const config = {
     hostedZoneName: "adriantunez.cloud",
     mainDomainName: "adriantunez.cloud",
     domainNames: ["adriantunez.cloud", "www.adriantunez.cloud"],
-    // PR previews are served from pr<N>.<previewDomainName>
     previewDomainName: "preview.adriantunez.cloud",
     previewPrefix: "previews",
     previewExpirationDays: 30,
@@ -30,7 +26,6 @@ export const config = {
     cdkDiff: [`repo:${repository}:pull_request`],
     cdkDeploy: [`repo:${repository}:environment:prod-infrastructure`],
     webDeploy: [`repo:${repository}:environment:prod-web`],
-    // Pull request jobs without a GitHub environment (previews and cleanup)
     webPreview: [`repo:${repository}:pull_request`],
   },
 };

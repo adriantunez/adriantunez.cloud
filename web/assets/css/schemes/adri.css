@@ -1,4 +1,3 @@
-/* Site scheme: Blowfish neutrals with a teal primary that matches the accent in custom.css */
 :root {
   --color-neutral: 255, 255, 255;
   /* Gray */
@@ -12,7 +11,7 @@
   --color-neutral-700: 51, 65, 85;
   --color-neutral-800: 30, 41, 59;
   --color-neutral-900: 15, 23, 42;
-  /* Teal, built around the site accent (custom.css): 300 = #46e4dc (dark), 700 = #006d72 (light) */
+  /* Teal */
   --color-primary-50: 236, 253, 252;
   --color-primary-100: 205, 250, 247;
   --color-primary-200: 160, 244, 239;

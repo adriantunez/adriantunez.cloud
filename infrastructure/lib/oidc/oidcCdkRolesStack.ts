@@ -10,7 +10,6 @@ interface OidcCdkRolesStackProps extends StackProps {
   deploySubjects: string[];
 }
 
-// Roles GitHub Actions assumes to run cdk diff and cdk deploy.
 export class OidcCdkRolesStack extends Stack {
   constructor(scope: Construct, id: string, props: OidcCdkRolesStackProps) {
     super(scope, id, props);

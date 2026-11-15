@@ -7,7 +7,7 @@ permissions:
   contents: read
   id-token: write
   actions: write
-  pull-requests: write # preview comment
+  pull-requests: write
 
 concurrency:
   group: pr-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -37,8 +37,6 @@ jobs:
       COMMAND: diff
       ROLE_NAME: DiffOidcCdkRole-prod
 
-  # Builds the site and publishes it at https://pr<N>.preview.adriantunez.cloud/.
-  # Forks and Dependabot get no OIDC token, so they only build.
   preview:
     if: ${{ needs.dispatcher.outputs.changes == 'true' }}
     needs: dispatcher

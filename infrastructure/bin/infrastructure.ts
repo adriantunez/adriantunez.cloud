@@ -24,7 +24,6 @@ new OidcCdkRolesStack(app, `OidcCdkRolesStack-${config.environment}`, {
   deploySubjects: config.oidcSubjects.cdkDeploy,
 });
 
-// CloudFront only accepts certificates from us-east-1
 const certificate = new CertificateStack(
   app,
   `CertificateStack-${config.environment}`,

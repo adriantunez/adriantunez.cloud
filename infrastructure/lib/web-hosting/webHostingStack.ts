@@ -14,8 +14,6 @@ interface WebHostingStackProps extends StackProps {
   ssm: SsmConfig;
 }
 
-// One bucket and one distribution serve production (bucket root)
-// and PR previews (<previewPrefix>/pr<N>/ on pr<N>.<previewDomainName>).
 export class WebHostingStack extends Stack {
   constructor(scope: Construct, id: string, props: WebHostingStackProps) {
     super(scope, id, props);

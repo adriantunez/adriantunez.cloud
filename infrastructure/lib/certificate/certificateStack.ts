@@ -11,7 +11,6 @@ interface CertificateStackProps extends StackProps {
   web: WebConfig;
 }
 
-// Certificate for the site and its PR previews. Must live in us-east-1.
 export class CertificateStack extends Stack {
   public readonly certificate: Certificate;
 

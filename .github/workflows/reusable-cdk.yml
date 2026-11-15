@@ -1,8 +1,5 @@
 name: reusable-cdk
 
-# Runs `cdk diff` (pull requests) or `cdk deploy` (releases) for every stack.
-# The AWS account comes from the assumed role; the rest lives in infrastructure/config/config.ts.
-
 on:
   workflow_call:
     inputs:

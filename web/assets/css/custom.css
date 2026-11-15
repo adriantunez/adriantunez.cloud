@@ -237,7 +237,7 @@ body.flex {
 }
 
 /* Support widget (Lightning + Buy Me a Coffee) */
-.support { padding: clamp(1rem, 3vw, 1.75rem); } /* same padding as the newsletter card */
+.support { padding: clamp(1rem, 3vw, 1.75rem); }
 .support h2 { margin: 0; font-weight: 700; font-size: 1.35rem; letter-spacing: normal; }
 .support h2 + p { margin-block: .5rem 0; }
 .support-page .support { margin-top: 1.5rem; }
@@ -287,7 +287,6 @@ body.flex {
 .home-contact .icon { width: 1.4em; height: 1.4em; flex: none; color: var(--accent); }
 .home-contact .cta { margin: 0; }
 
-/* Date line on post cards, with an optional Coffee Shot badge */
 .post-meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem .75rem; }
 .coffee-shot { display: inline-flex; align-items: center; gap: .3em; color: var(--accent); font-size: .85rem; font-weight: 650; }
 .coffee-shot .icon { display: inline-block; width: 1em; height: 1em; }

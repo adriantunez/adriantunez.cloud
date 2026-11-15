@@ -1,5 +1,3 @@
-{{/* Support widget: Lightning (LNURL-pay via a Lightning Address) and Buy Me a Coffee tabs.
-     Call with (dict "page" . "heading" true). An empty support.lightningAddress runs it in demo mode. */}}
 {{ $address := site.Params.support.lightningAddress | default "" }}
 {{ $amount := site.Params.support.defaultAmount | default 5000 }}
 {{ $coffee := site.Params.buymeacoffee.identifier }}

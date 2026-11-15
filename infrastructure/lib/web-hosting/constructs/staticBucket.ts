@@ -26,7 +26,6 @@ export class StaticBucket extends Construct {
       autoDeleteObjects: false,
       lifecycleRules: [
         {
-          // Safety net in case the PR cleanup job doesn't run
           id: "ExpirePreviews",
           prefix: `${props.previewPrefix}/`,
           expiration: Duration.days(props.previewExpirationDays),

@@ -8,7 +8,6 @@ export interface SsmWebHostingOutputsProps {
   distributionId: string;
 }
 
-// Publishes bucket name and distribution ID for the deploy workflows
 export class SsmWebHostingOutputs extends Construct {
   constructor(scope: Construct, id: string, props: SsmWebHostingOutputsProps) {
     super(scope, id);

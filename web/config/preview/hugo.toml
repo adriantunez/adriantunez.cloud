@@ -1,4 +1,3 @@
-# PR previews (hugo --environment preview): keep them out of search engines.
 disableKinds = ["sitemap", "robotsTXT"]
 
 [params]

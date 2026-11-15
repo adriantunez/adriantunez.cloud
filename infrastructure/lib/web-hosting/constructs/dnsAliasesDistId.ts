@@ -25,7 +25,6 @@ export class DnsAliasesDistId extends Construct {
     const target = RecordTarget.fromAlias(
       new CloudFrontTarget(props.distribution),
     );
-    // IPv4 and IPv6 aliases (the distribution has IPv6 enabled)
     props.domainNames.forEach((recordName, i) => {
       new ARecord(this, `AliasARecord${i}`, { zone, recordName, target });
       new AaaaRecord(this, `AliasAaaaRecord${i}`, { zone, recordName, target });

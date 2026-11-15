@@ -1,8 +1,3 @@
-// CloudFront viewer-request function. Placeholders are filled in by CDK.
-// - Production: redirects other hosts (www) to the main domain.
-// - Previews: pr<N>.<preview domain> is served from /<prefix>/pr<N>/ in the bucket.
-// - Previews are never served on the main domain (/<prefix>/... returns 404).
-// - Both: clean URLs (no index.html, trailing slash on folders).
 function handler(event) {
     var request = event.request;
     var uri = request.uri;
@@ -28,7 +23,6 @@ function handler(event) {
     } else if (host !== mainDomain) {
         return redirect('https://' + mainDomain + uri);
     } else if (uri === '/%%PREVIEW_PREFIX%%' || uri.startsWith('/%%PREVIEW_PREFIX%%/')) {
-        // Missing key: S3 answers 403, which the distribution turns into the 404 page
         request.uri = '/404-not-found';
         return request;
     }

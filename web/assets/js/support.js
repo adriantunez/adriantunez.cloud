@@ -1,4 +1,3 @@
-// Support widget: tabs, plus Lightning invoices via LNURL-pay (LUD-06/16) and payment checks via LUD-21.
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("[data-support]").forEach(initSupport);
 });
@@ -11,7 +10,7 @@ function initSupport(root) {
   const openLink = root.querySelector(".support-open");
   const invoiceCopy = invoiceBox.querySelector(".support-copy");
   const weblnButton = root.querySelector(".support-webln");
-  let payRequest = null; // cached LNURL-pay metadata
+  let payRequest = null;
   let pollTimer = null;
   let currentInvoice = "";
 
@@ -105,7 +104,6 @@ function initSupport(root) {
     return data;
   }
 
-  // Demo mode: a random, invalid invoice so the layout can be checked without a real address.
   async function fakeInvoice() {
     await new Promise(function (resolve) { setTimeout(resolve, 400); });
     const chars = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
@@ -117,7 +115,7 @@ function initSupport(root) {
   function showInvoice(pr, sats) {
     currentInvoice = pr;
     const qr = qrcode(0, "M");
-    qr.addData(("lightning:" + pr).toUpperCase(), "Alphanumeric"); // uppercase keeps the QR small
+    qr.addData(("lightning:" + pr).toUpperCase(), "Alphanumeric");
     qr.make();
     qrBox.innerHTML = qrSvg(qr);
     openLink.href = "lightning:" + pr;
@@ -141,7 +139,6 @@ function initSupport(root) {
       '" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path fill="#000" d="' + path + '"/></svg>';
   }
 
-  // LUD-21: poll the verify URL until the invoice settles (gives up after ~10 minutes).
   function poll(verify, attempt) {
     attempt = attempt || 0;
     if (attempt > 200) return;

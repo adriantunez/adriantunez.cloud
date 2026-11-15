@@ -1,8 +1,5 @@
 name: PR Cleanup
 
-# Deletes a PR's preview (previews/pr<N>/) when the PR is closed or merged.
-# The bucket also expires previews/ after 30 days, in case this doesn't run.
-
 on:
   pull_request:
     types: [closed]
@@ -12,7 +9,6 @@ permissions:
   id-token: write
 
 env:
-  # Published by WebHostingStack, see infrastructure/config/config.ts
   SSM_BUCKET_NAME: /web/prod/bucketName
   SSM_DISTRIBUTION_ID: /web/prod/distributionId
   PREFIX: previews/pr${{ github.event.pull_request.number }}
