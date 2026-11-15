@@ -69,6 +69,17 @@ describe("stacks", () => {
     );
   });
 
+  test("only Amazon can issue certificates for the domain", () => {
+    Template.fromStack(stacks.certificate).hasResourceProperties(
+      "AWS::Route53::RecordSet",
+      {
+        Name: "adriantunez.cloud.",
+        Type: "CAA",
+        ResourceRecords: ['0 issue "amazon.com"'],
+      },
+    );
+  });
+
   test("bucket is private and expires previews", () => {
     Template.fromStack(stacks.hosting).hasResourceProperties(
       "AWS::S3::Bucket",

@@ -3,7 +3,7 @@ import {
   Certificate,
   CertificateValidation,
 } from "aws-cdk-lib/aws-certificatemanager";
-import { HostedZone } from "aws-cdk-lib/aws-route53";
+import { CaaAmazonRecord, HostedZone } from "aws-cdk-lib/aws-route53";
 import { Construct } from "constructs";
 import type { WebConfig } from "../../config/config";
 
@@ -30,5 +30,7 @@ export class CertificateStack extends Stack {
       ],
       validation: CertificateValidation.fromDns(zone),
     });
+
+    new CaaAmazonRecord(this, "CaaAmazon", { zone });
   }
 }
