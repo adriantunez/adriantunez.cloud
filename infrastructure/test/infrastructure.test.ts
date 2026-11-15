@@ -113,27 +113,32 @@ describe("stacks", () => {
     const records = Template.fromStack(stacks.hosting).findResources(
       "AWS::Route53::RecordSet",
     );
-    const types = Object.values(records).map((r) => r.Properties.Type).sort();
+    const types = Object.values(records)
+      .map((r) => r.Properties.Type)
+      .sort();
     expect(types).toEqual(["A", "A", "A", "AAAA", "AAAA", "AAAA"]);
   });
 
   test("cdk diff role only trusts pull requests", () => {
-    Template.fromStack(stacks.cdkRoles).hasResourceProperties("AWS::IAM::Role", {
-      RoleName: "DiffOidcCdkRole-prod",
-      AssumeRolePolicyDocument: Match.objectLike({
-        Statement: [
-          Match.objectLike({
-            Condition: Match.objectLike({
-              StringLike: {
-                "token.actions.githubusercontent.com:sub": [
-                  "repo:adriantunez/adriantunez.cloud:pull_request",
-                ],
-              },
+    Template.fromStack(stacks.cdkRoles).hasResourceProperties(
+      "AWS::IAM::Role",
+      {
+        RoleName: "DiffOidcCdkRole-prod",
+        AssumeRolePolicyDocument: Match.objectLike({
+          Statement: [
+            Match.objectLike({
+              Condition: Match.objectLike({
+                StringLike: {
+                  "token.actions.githubusercontent.com:sub": [
+                    "repo:adriantunez/adriantunez.cloud:pull_request",
+                  ],
+                },
+              }),
             }),
-          }),
-        ],
-      }),
-    });
+          ],
+        }),
+      },
+    );
   });
 
   test("preview role trusts pull requests and only writes under previews/", () => {
@@ -238,5 +243,40 @@ describe("edge function", () => {
     expect(run("adriantunez.cloud", "/previews-guide/").uri).toBe(
       "/previews-guide/index.html",
     );
+  });
+});
+
+describe("security headers function", () => {
+  const code = renderFunctionCode({
+    functionRelPath: "functions/cf-security-headers.js",
+    replacements: {},
+  });
+  const handler = new Function(`${code}; return handler;`)();
+  const response = handler({
+    response: {
+      statusCode: 200,
+      headers: {
+        server: { value: "AmazonS3" },
+        "x-amz-server-side-encryption": { value: "AES256" },
+        "x-xss-protection": { value: "1; mode=block" },
+      },
+    },
+  });
+
+  test("adds security headers", () => {
+    expect(response.headers["strict-transport-security"].value).toBe(
+      "max-age=31536000; includeSubDomains",
+    );
+    expect(response.headers["content-security-policy"].value).toBe(
+      "frame-ancestors 'none'",
+    );
+    expect(response.headers["x-frame-options"].value).toBe("DENY");
+    expect(response.headers["permissions-policy"]).toBeDefined();
+    expect(response.headers["x-xss-protection"].value).toBe("0");
+  });
+
+  test("removes server and storage headers", () => {
+    expect(response.headers.server).toBeUndefined();
+    expect(response.headers["x-amz-server-side-encryption"]).toBeUndefined();
   });
 });

@@ -37,11 +37,21 @@ export class WebHostingStack extends Stack {
       },
     });
 
+    const securityHeadersFunction = new EdgeCfFunction(
+      this,
+      "SecurityHeadersFunction",
+      {
+        functionRelPath: "functions/cf-security-headers.js",
+        replacements: {},
+      },
+    );
+
     const cdn = new cdnStaticBucket(this, "Cdn", {
       bucket: staticBucket.bucket,
       certificate: props.certificate,
       domainNames,
       viewerRequestFn: edgeCfFunction.cfFunction,
+      viewerResponseFn: securityHeadersFunction.cfFunction,
       pricingPlanWebAclArn: props.web.pricingPlanWebAclArn,
     });
 

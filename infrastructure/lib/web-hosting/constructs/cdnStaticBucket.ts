@@ -20,6 +20,7 @@ export interface cdnStaticBucketProps {
   certificate: ICertificate;
   domainNames: string[];
   viewerRequestFn: CloudFrontFunction;
+  viewerResponseFn: CloudFrontFunction;
   pricingPlanWebAclArn: string;
 }
 
@@ -46,6 +47,10 @@ export class cdnStaticBucket extends Construct {
           {
             function: props.viewerRequestFn,
             eventType: FunctionEventType.VIEWER_REQUEST,
+          },
+          {
+            function: props.viewerResponseFn,
+            eventType: FunctionEventType.VIEWER_RESPONSE,
           },
         ],
       },
