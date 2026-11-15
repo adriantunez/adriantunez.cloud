@@ -1,127 +1,94 @@
 # CI/CD Workflows
 
-> GitHub Actions workflows for automated testing, building, and deployment of both the infrastructure and the webpage.
-
-This directory contains GitHub Actions workflows that automate the entire lifecycle of the adriantunez.cloud webpage project, from testing infrastructure as code to deploying the live website.
+> GitHub Actions workflows for automated testing, previews and deployment of both the infrastructure and the webpage.
 
 ## Workflow Structure
 
 ```
 .github/workflows/
-├── production.yml              # Production deployment workflow (release-triggered)
-├── staging.yml                 # Staging deployment workflow (main-branch triggered)
-├── pr.yaml                     # Pull request validation workflow
-├── reusable-dispatcher.yml     # Smart change detection, called dispatcher
-├── reusable-cdk-deploy.yml     # Reusable CDK deployment
-├── reusable-cdk-diff.yml       # Reusable CDK diff and audit
-├── reusable-cdk-tests.yml      # Reusable CDK testing
-└── reusable-hugo.yml           # Reusable Hugo build & optional deploy
+├── production.yml              # Production deployment (release-triggered)
+├── pr.yaml                     # Pull request validation and preview
+├── pr-cleanup.yaml             # Deletes the PR preview when the PR closes
+├── reusable-dispatcher.yml     # Change detection (skips runs without relevant changes)
+├── reusable-cdk-tests.yml      # CDK tests and npm audit
+├── reusable-cdk.yml            # cdk diff or cdk deploy
+└── reusable-hugo.yml           # Hugo build, optional upload to S3 and cache invalidation
 ```
 
-## Workflow Types
+## Workflows
 
-### Main Workflow
-
-#### `production.yml` - Production Deployment
+### `production.yml` - Production Deployment
 
 - **Trigger**: Release created (GitHub releases)
-- **Purpose**: Deploy to production environment
 - **Steps**:
-  1. Detect changes using dispatcher (skip run if no relevant changes)
-  2. Run CDK tests across all environments
-  3. Deploy infrastructure changes to production
-  4. Build and deploy Hugo productionsite
+  1. Detect changes using the dispatcher (skip the run if nothing relevant changed)
+  2. Run CDK tests
+  3. Deploy infrastructure (`prod-infrastructure` environment)
+  4. Build Hugo with `--environment production` and sync it to the bucket root (`prod-web` environment). The `previews/` folder is left untouched.
 
-#### `staging.yml` - Staging Deployment
+### `pr.yaml` - Pull Request Validation
 
-- **Trigger**: Push to `main` branch
-- **Purpose**: Deploy to staging environment for testing
+- **Trigger**: Pull request opened, updated or reopened
 - **Steps**:
-  1. Detect changes using dispatcher (skip run if no relevant changes)
-  2. Run CDK tests across all environments
-  3. 4. Deploy infrastructure changes to staging
-  4. Build and deploy staging site
-
-#### `pr.yaml` - Pull Request Validation
-
-- **Trigger**: Pull request to any branch
-- **Purpose**: Validate changes before merge
-- **Steps**:
-  1. Detect changes using dispatcher
-  2. Run CDK tests across all environments
-  3. Run CDK diff for all environments
-  4. Validate Hugo build for all environments
-  5. All-good job to allow PR merge-only when everything's good
+  1. Detect changes using the dispatcher
+  2. Run CDK tests and `cdk diff`
+  3. Build Hugo with `--environment preview` and upload it to `previews/pr<N>/`
+  4. Comment the preview URL (`https://pr<N>.preview.adriantunez.cloud/`) on the PR, updating the same comment on every push
+  5. All-good job to allow PR merge only when everything's good
 
 > **Note: The all-good job is a trick to enforce PR GHA success validation before merging, but only if relevant changes have been done.**
 
-### Reusable Workflows
+Pull requests from forks and Dependabot get no AWS credentials, so they only build.
 
-#### `reusable-dispatcher.yml`
+### `pr-cleanup.yaml` - Preview Cleanup
 
-- **Purpose**: Smart change detection and workflow optimization
-- **Features**:
-  - Path-based filtering to detect relevant changes
-  - Prevents unnecessary workflow runs
-  - Supports complex filter patterns including exclusions
-  - Outputs boolean flag for conditional job execution
+- **Trigger**: Pull request closed or merged
+- **Steps**: Delete `previews/pr<N>/` and invalidate its cache
 
-#### `reusable-cdk-tests.yml`
+## Reusable Workflows
 
-- **Purpose**: Run CDK infrastructure tests
-- **Features**:
-  - Jest-based testing framework
-  - Multiple environment validation
-  - Dependency vulnerability auditing
+### `reusable-dispatcher.yml`
 
-#### `reusable-cdk-diff.yml`
+- Path-based filtering (`.github/filters.yml`) to detect relevant changes
+- Outputs a boolean flag for conditional job execution
 
-- **Purpose**: Generate infrastructure change previews
-- **Features**:
-  - Early error detection
-  - Resource modification preview
+### `reusable-cdk-tests.yml`
 
-#### `reusable-cdk-deploy.yml`
+- Jest infrastructure tests
+- Dependency vulnerability audit (non-blocking)
 
-- **Purpose**: Deploy CDK infrastructure
-- **Features**:
-  - OIDC authentication for IaC & web deployment
-  - OIDC roles for "readonly" (diff) and "readwrite" (deploy)
-  - Environment-specific deployments
+### `reusable-cdk.yml`
 
-#### `reusable-hugo.yml`
+- Runs `cdk diff` or `cdk deploy` for all stacks
+- Inputs: `COMMAND` (diff or deploy), `ROLE_NAME`, optional `GHA_ENVIRONMENT`
 
-- **Purpose**: Build and deploy Hugo site
-- **Features**:
-  - Hugo build with minification
-  - S3 deployment with sync
-  - CloudFront cache invalidation
-  - Build artifact management
+### `reusable-hugo.yml`
+
+- Hugo build with minification (version read from `.tool-versions`)
+- Optional upload: bucket root for production, `S3_PREFIX` (e.g. `previews/pr12`) for previews
+- CloudFront invalidation of the uploaded path only
 
 ## Environments
 
-The project supports multiple deployment environments:
+| Environment | Trigger      | URL                                      | Hugo environment |
+| ----------- | ------------ | ---------------------------------------- | ---------------- |
+| Production  | Release      | `https://adriantunez.cloud`              | `production`     |
+| PR preview  | Pull request | `https://pr<N>.preview.adriantunez.cloud` | `preview` (noindex) |
+| Local       | `hugo server`| `http://localhost:1313`                  | `development`    |
 
-### Production Environment
+## Authentication
 
-- **Trigger**: GitHub releases
-- **Purpose**: Live production website
-- **Domain**: `adriantunez.cloud`
-- **Infrastructure**: Full AWS stack with production settings
-- **Approval**: Manual release creation required
+All AWS access uses GitHub OIDC, with no long-lived credentials. Role ARNs are built from the `AWS_ACCOUNT_ID` repository variable and fixed role names:
 
-### Staging Environment
+| Role                        | Used by             | GitHub OIDC subject          |
+| --------------------------- | ------------------- | ---------------------------- |
+| `DiffOidcCdkRole-prod`      | `cdk diff`          | `pull_request`               |
+| `DeployOidcCdkRole-prod`    | `cdk deploy`        | `environment:prod-infrastructure` |
+| `DeployOidcWebRole-prod`    | Production upload   | `environment:prod-web`       |
+| `PreviewOidcWebRole-prod`   | Preview upload and cleanup | `pull_request`        |
 
-- **Trigger**: Push to `main` branch
-- **Purpose**: Pre-production testing and validation
-- **Domain**: `staging.adriantunez.cloud`
-- **Infrastructure**: Production-like AWS stack for testing
-- **Approval**: Automatic deployment from main
+## Repository Settings
 
-### Development
-
-- **Trigger**: Local development
-- **Purpose**: Local testing and development
-- **Domain**: `localhost:1313`
-- **Infrastructure**: Local Hugo server
-- **Approval**: Developer-initiated
+- **Variables**: `AWS_ACCOUNT_ID`, `HUGO_PATH`, `INFRA_PATH`, `AUDIT_SUMMARY_FILE`
+- **Environments**: `prod-infrastructure`, `prod-web`
+- **Secrets**: none

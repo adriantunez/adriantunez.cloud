@@ -8,7 +8,7 @@ This directory contains all Infrastructure as Code (IaC) and deployment automati
 
 - **Infrastructure Provisioning**: Deploy and manage AWS resources for the website and supporting services
 - **Security Management**: Implement OIDC-based authentication for GitHub Actions
-- **Environment Support**: Currently supports staging & production environments
+- **Single Environment**: One production setup that also serves PR previews
 - **Automated CI/CD**: Automated testing, audit, diff and deploy of both infra and webpage
 
 ## Architecture
@@ -16,9 +16,23 @@ This directory contains all Infrastructure as Code (IaC) and deployment automati
 ### CDK Stacks
 
 1. **OIDCProviderStack**: GitHub OIDC identity provider
-2. **OidcCdkRolesStack**: IAM roles for CDK deployment operations
-3. **OidcWebRolesStack**: IAM roles for Hugo site deployment
-4. **WebHostingStack**: S3, CloudFront, and Route 53 resources
+2. **OidcCdkRolesStack-prod**: IAM roles for `cdk diff` (pull requests) and `cdk deploy` (releases)
+3. **CertificateStack-prod**: ACM certificate in us-east-1 for `adriantunez.cloud`, `www` and `*.preview`
+4. **WebHostingStack-prod**: S3 bucket, CloudFront distribution, CloudFront function and Route 53 records
+5. **OidcWebRolesStack-prod**: IAM roles to upload the site (whole bucket) and PR previews (`previews/` only)
+
+### PR previews
+
+Production and previews share one bucket and one distribution:
+
+- Production lives at the bucket root and is served on `adriantunez.cloud` (`www` redirects to it).
+- PR `<N>` lives under `previews/pr<N>/` and is served on `pr<N>.preview.adriantunez.cloud`.
+- The CloudFront function maps preview hosts to their folder, and returns 404 for `/previews/` on the main domain.
+- Previews are deleted when the PR closes, and a lifecycle rule expires anything under `previews/` after 30 days.
+
+### CloudFront pricing plan
+
+The distribution is on a CloudFront flat-rate pricing plan. CloudFront created its WAF web ACL with the subscription and doesn't allow removing or replacing it, so CDK only references it (`pricingPlanWebAclArn` in `config/config.ts`) and doesn't manage it.
 
 ## Directory Structure
 
@@ -27,6 +41,8 @@ infrastructure/
 ├── bin/
 │   └── infrastructure.ts          # CDK app entry point
 ├── lib/
+│   ├── certificate/
+│   │   └── certificateStack.ts    # ACM certificate (us-east-1)
 │   ├── oidc/                      # OIDC-related stacks
 │   │   ├── oidcProviderStack.ts   # GitHub OIDC provider
 │   │   ├── oidcCdkRolesStack.ts   # OIDC CDK deployment roles
@@ -36,33 +52,41 @@ infrastructure/
 │       ├── webHostingStack.ts     # Main hosting stack
 │       └── constructs/            # Reusable CDK constructs
 ├── config/
-│   └── environments.ts           # Environment configurations
+│   └── config.ts                 # Account, region, domains, SSM names, OIDC subjects
 ├── functions/
-│   └── cf-webredirect.js         # CloudFront function for redirects
+│   └── cf-webredirect.js         # CloudFront function: redirects, clean URLs, preview routing
 ├── test/
 │   └── infrastructure.test.ts    # Infrastructure tests
 ├── package.json                  # Node.js dependencies
 ├── cdk.json                      # CDK configuration
-├── tsconfig.json                 # TypeScript configuration
-├── .env.example                  # Environment variables template
-└── .env.test                     # Environment variables used by tests
+└── tsconfig.json                 # TypeScript configuration
 ```
 
 ## Test Coverage
 
 - **Stack Initialization**: Verify all stacks can be created without errors
 - **Resource Configuration**: Validate AWS resource configurations
-- **Cross-Stack Dependencies**: Ensure proper stack dependencies
-- **Environment Support**: Test multiple environment configurations
+- **IAM Scope**: The preview role only writes under `previews/`, the diff role only trusts pull requests
+- **CloudFront Function**: Redirects, clean URLs and preview routing
 
 ## Configuration
 
-### Environments
+Everything lives in `config/config.ts`. Nothing there is secret, so no `.env` files are needed.
 
-The project supports multiple environments configured in `config/environments.ts`:
+### Local usage
 
-- **Production**: Live environment with full AWS resources
-- **Staging**: Testing environment with similar setup
+```bash
+npm ci
+npm test
+npm run cdk:diff      # needs AWS credentials for the account in config.ts
+npm run cdk:deploy
+```
+
+The certificate stack lives in us-east-1, so both regions must be bootstrapped once:
+
+```bash
+npx cdk bootstrap aws://<account>/eu-west-1 aws://<account>/us-east-1
+```
 
 ## Security Features
 
