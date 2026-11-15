@@ -13,6 +13,7 @@ function initSupport(root) {
   let payRequest = null;
   let pollTimer = null;
   let currentInvoice = "";
+  let requestId = 0;
 
   // Tabs
   const tabs = Array.from(root.querySelectorAll('[role="tab"]'));
@@ -67,14 +68,17 @@ function initSupport(root) {
   });
 
   async function requestInvoice(sats) {
+    const id = ++requestId;
     clearTimeout(pollTimer);
     invoiceBox.hidden = true;
     status.textContent = "Creating invoice…";
     try {
       const { pr, verify } = address ? await fetchInvoice(sats) : await fakeInvoice();
+      if (id !== requestId) return;
       showInvoice(pr, sats);
-      if (verify) poll(verify);
+      if (verify) poll(verify, id);
     } catch (error) {
+      if (id !== requestId) return;
       status.textContent = error.message || "Couldn’t create the invoice. Please try again.";
     }
   }
@@ -139,15 +143,16 @@ function initSupport(root) {
       '" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path fill="#000" d="' + path + '"/></svg>';
   }
 
-  function poll(verify, attempt) {
+  function poll(verify, id, attempt) {
     attempt = attempt || 0;
     if (attempt > 200) return;
     pollTimer = setTimeout(async function () {
       try {
         const result = await getJSON(verify);
+        if (id !== requestId) return;
         if (result.settled) return paid();
       } catch { /* keep polling */ }
-      poll(verify, attempt + 1);
+      if (id === requestId) poll(verify, id, attempt + 1);
     }, 3000);
   }
 
